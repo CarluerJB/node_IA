@@ -197,6 +197,7 @@ class Socket(Serializable):
     def codealize(self) -> OrderedDict:
         return OrderedDict([
             ('id', self.id),
+            ('index', self.index),
         ])
 
     def serialize(self) -> OrderedDict:
