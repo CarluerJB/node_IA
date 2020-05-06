@@ -58,6 +58,10 @@ class CustomNode(Node):
         self.value = None
         self.markDirty()
 
+    def initSettings(self):
+        super().initSettings()
+        self.output_multi_edged = True
+
     def initInnerClasses(self):
         self.content = CustomContent(self)
         self.grNode = CustomGraphicsNode(self)

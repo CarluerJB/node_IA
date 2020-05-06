@@ -12,7 +12,7 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_edge import Edge, EDGE_TYPE_BEZIER
 from nodeeditor.node_graphics_view import QDMGraphicsView
 
-from nodeeditor.IA_input_node import CustomNode_InputShape, CustomNode_Output, CustomNode_Add
+from nodeeditor.IA_input_node import CustomNode_Input, CustomNode_Output, CustomNode_Add
 
 class NodeEditorWidget(QWidget):
     Scene_class = Scene
@@ -171,8 +171,8 @@ class NodeEditorWidget(QWidget):
 
     def addNodes(self):
         """Testing method to create 3 `Nodes` with 3 `Edges` connecting them"""
-        node1 = CustomNode_InputShape(self.scene)
-        node2 = CustomNode_InputShape(self.scene)
+        node1 = CustomNode_Input(self.scene)
+        node2 = CustomNode_Input(self.scene)
         node3 = CustomNode_Add(self.scene)
         node4 = CustomNode_Output(self.scene)
 

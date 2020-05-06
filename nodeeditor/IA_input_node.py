@@ -8,116 +8,6 @@ from nodeeditor.node_socket import LEFT_BOTTOM, LEFT_CENTER, LEFT_TOP, RIGHT_BOT
 import numpy as np
 import ast
 
-
-class CustomInputContent(QDMNodeContentWidget):
-    def initUI(self):
-        self.edit = QLineEdit('1', self)
-        self.edit.setAlignment(Qt.AlignRight)
-        self.edit.setObjectName(self.node.content_label_objname)
-
-    def serialize(self):
-        res = super().serialize()
-        res['value'] = self.edit.text()
-        return res
-
-    def deserialize(self, data, hashmap={}):
-        res = super().deserialize(data, hashmap)
-        try:
-            value = data['value']
-            self.edit.setText(value)
-            return True & res
-        except Exception as e:
-            dumpException(e)
-        return res
-
-
-@register_node(OP_NODE_INPUT)
-class CustomNode_Input(CustomNode):
-    icon = "nodeeditor/images/input.png"
-    op_code = OP_NODE_INPUT
-    op_title = "Input"
-    content_label = "In"
-    content_label_objname = "custom_node_input"
-
-    def __init__(self, scene):
-        super().__init__(scene, inputs=[], outputs=[1])
-        self.scene.addInputs(self)
-
-    def initSettings(self):
-        super().initSettings()
-        self.socket_spacing = 25
-
-        self.input_socket_position = LEFT_TOP
-        self.output_socket_position = RIGHT_TOP
-        self.input_multi_edged = False
-        self.output_multi_edged = True
-        self.input_can_be_added = False
-        self.output_can_be_added = False
-
-    def initInnerClasses(self):
-        self.content = CustomInputContent(self)
-        self.grNode = CustomGraphicsNode(self)
-        self.content.edit.textChanged.connect(self.onInputChanged)
-
-    def initCompatible_InOut(self):
-        self.node_type = INPUT_NODE_TYPE
-        self.compat_input = []
-        self.compat_output = [OUTPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
-
-    def evalImplementation(self):
-        u_value = self.content.edit.text()
-        s_value = int(u_value)
-        self.value = s_value
-        self.markDirty(False)
-        self.markInvalid(False)
-
-        self.markDescendantsInvalid(False)
-        self.markDescendantsDirty()
-
-        self.grNode.setToolTip("")
-
-        self.evalChildren()
-
-        return self.value
-
-
-class CustomSliderContent(QDMNodeContentWidget):
-    def initUI(self):
-        self.layout = QVBoxLayout()
-        self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setObjectName(self.node.content_label_objname)
-        self.setLayout(self.layout)
-        self.layout.addWidget(self.slider, Qt.AlignLeft)
-
-
-@register_node(OP_NODE_SLIDER)
-class CustomNode_Slider(CustomNode):
-    icon = ""
-    op_code = OP_NODE_SLIDER
-    op_title = "Slider"
-    content_label = ""
-    content_label_objname = "custom_node_slider"
-
-    def __init__(self, scene):
-        super().__init__(scene, inputs=[1, 1], outputs=[1])
-
-    def initInnerClasses(self):
-        self.content = CustomSliderContent(self)
-        self.grNode = CustomGraphicsNode(self)
-
-
-class CustomOutputContent(QDMNodeContentWidget):
-    def initUI(self):
-        self.lbl = QLabel('sigmoid', self)
-        self.lbl.setAlignment(Qt.AlignLeft)
-        self.lbl.setObjectName(self.node.content_label_objname)
-
-    def serialize(self):
-        res = super().serialize()
-        res['value'] = self.lbl.text()
-        return res
-
-
 @register_node(OP_NODE_OUTPUT)
 class CustomNode_Output(CustomNode):
     icon = "nodeeditor/images/output.png"
@@ -132,12 +22,12 @@ class CustomNode_Output(CustomNode):
 
     def codealize(self):
         res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Activation("' + self.content.lbl.text() + '")'
+        res['tfrepr'] = 'keras.layers.Activation("' + self.content.comboBox.currentText() + '")'
         res['type'] = "output"
         return res
 
     def initInnerClasses(self):
-        self.content = CustomOutputContent(self)
+        self.content = CustomActivationContent(self) #CustomOutputContent(self)
         self.grNode = CustomGraphicsNode(self)
 
     def initCompatible_InOut(self):
@@ -185,6 +75,12 @@ class CustomNode_Dense(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
+    def codealize(self):
+        res = super().codealize()
+        res['tfrepr'] = 'keras.layers.Dense("' + self.content.edit.text() + '")'
+        res['type'] = "hidden"
+        return res
+
     def initInnerClasses(self):
         self.content = CustomDenseContent(self)
         self.grNode = CustomGraphicsNode(self)
@@ -198,7 +94,7 @@ class CustomConcatContent(QDMNodeContentWidget):
 
 
 @register_node(OP_NODE_CONCAT)
-class CustomNode_Dense(CustomNode):
+class CustomNode_Concat(CustomNode):
     icon = ""
     op_code = OP_NODE_CONCAT
     op_title = "Concat"
@@ -206,7 +102,17 @@ class CustomNode_Dense(CustomNode):
     content_label_objname = "custom_node_concat"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1, 2], outputs=[1])
+        super().__init__(scene, inputs=[1], outputs=[1])
+
+    def codealize(self):
+        res = super().codealize()
+        res['tfrepr'] = 'keras.layers.Concatenate()'
+        res['type'] = "hidden"
+        return res
+
+    def initSettings(self):
+        super().initSettings()
+        self.input_multi_edged = True
 
     def initInnerClasses(self):
         self.content = CustomDenseContent(self)
@@ -237,9 +143,6 @@ class CustomNode_Add(CustomNode):
         self.input_socket_position = LEFT_TOP
         self.output_socket_position = RIGHT_TOP
         self.input_multi_edged = True
-        self.output_multi_edged = False
-        self.input_can_be_added = False
-        self.output_can_be_added = False
 
     def initInnerClasses(self):
         self.grNode = CustomGraphicsNode(self)
@@ -266,6 +169,12 @@ class CustomNode_Prod(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
+    def codealize(self):
+        res = super().codealize()
+        res['tfrepr'] = "keras.layers.Multiply()"
+        res['type'] = "hidden"
+        return res
+
     def initSettings(self):
         super().initSettings()
         self.socket_spacing = 25
@@ -273,9 +182,7 @@ class CustomNode_Prod(CustomNode):
         self.input_socket_position = LEFT_TOP
         self.output_socket_position = RIGHT_TOP
         self.input_multi_edged = True
-        self.output_multi_edged = False
-        self.input_can_be_added = False
-        self.output_can_be_added = False
+
 
     def initInnerClasses(self):
         self.grNode = CustomGraphicsNode(self)
@@ -297,10 +204,10 @@ class CustomInputShapeContent(QDMNodeContentWidget):
 
 
 @register_node(OP_NODE_INPUTSHAPE)
-class CustomNode_InputShape(CustomNode):
+class CustomNode_Input(CustomNode):
     icon = "nodeeditor/images/input.png"
     op_code = OP_NODE_INPUTSHAPE
-    op_title = "inputShapes"
+    op_title = "Input"
     content_label = ""
     content_label_objname = "custom_node_inputShape"
 
@@ -361,7 +268,7 @@ class CustomActivationContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
         self.comboBox = QComboBox(self)
-        self.comboBox.addItem("None")
+        #self.comboBox.addItem("None")
         self.comboBox.addItem("elu")
         self.comboBox.addItem("softmax")
         self.comboBox.addItem("selu")
