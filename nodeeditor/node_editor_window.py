@@ -137,8 +137,10 @@ class NodeEditorWindow(QMainWindow):
         """Create basic `File` and `Edit` actions"""
         self.actNew = QAction('&New', self, shortcut='Ctrl+N', statusTip="Create new graph", triggered=self.onFileNew)
         self.actOpen = QAction('&Open', self, shortcut='Ctrl+O', statusTip="Open file", triggered=self.onFileOpen)
-        self.actSave = QAction('&Save', self, shortcut='Ctrl+S', statusTip="Save file", triggered=self.onFileSave)
+        self.actSave = QAction('&Save', self, shortcut='Ctrl+S', statusTip="Save file", triggered=self.onFileSave)        
         self.actSaveAs = QAction('Save &As...', self, shortcut='Ctrl+Shift+S', statusTip="Save file as...", triggered=self.onFileSaveAs)
+        self.actSaveToCode = QAction('&Save to code', self, shortcut='Ctrl+T', statusTip="Save node system to code", triggered=self.onFileSaveToCode)
+        self.actSaveAsToCode = QAction('&Save to code &As...', self, shortcut='Ctrl+Y', statusTip="Save node system to code as...", triggered=self.onFileSaveToCodeAs)
         self.actExit = QAction('E&xit', self, shortcut='Ctrl+Q', statusTip="Exit application", triggered=self.close)
 
         self.actUndo = QAction('&Undo', self, shortcut='Ctrl+Z', statusTip="Undo last operation", triggered=self.onEditUndo)
@@ -162,6 +164,9 @@ class NodeEditorWindow(QMainWindow):
         self.fileMenu.addAction(self.actOpen)
         self.fileMenu.addAction(self.actSave)
         self.fileMenu.addAction(self.actSaveAs)
+        self.fileMenu.addSeparator()
+        self.fileMenu.addAction(self.actSaveToCode)
+        self.fileMenu.addAction(self.actSaveAsToCode)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.actExit)
 
@@ -248,6 +253,10 @@ class NodeEditorWindow(QMainWindow):
     def getFileDialogFilter(self):
         """Returns ``str`` standard file open/save filter for ``QFileDialog``"""
         return 'Graph (*.json);;All files (*)'
+    
+    def getCodeFileDialogFilter(self):
+        """Returns ``str`` standard file open/save filter for ``QFileDialog``"""
+        return 'Python File (*.py);;C++ File (*.cpp) -- NOT IMPLEMENTED;;All files (*)'
 
     def onFileNew(self):
         """Hande File New operation"""
@@ -292,6 +301,29 @@ class NodeEditorWindow(QMainWindow):
             if hasattr(current_nodeeditor, "setTitle"): current_nodeeditor.setTitle()
             else: self.setTitle()
             return True
+    
+    def onFileSaveToCode(self):
+        """Handle File Save to Code operation"""
+        current_nodeeditor = self.getCurrentNodeEditorWidget()
+        if current_nodeeditor is not None:
+            if not current_nodeeditor.isCodeFilenameSet(): return self.onFileSaveToCodeAs()
+
+            current_nodeeditor.fileSaveToCode()
+            self.statusBar().showMessage("Successfully saved %s" % current_nodeeditor.filename, 5000)
+
+    
+    def onFileSaveToCodeAs(self):
+        """Handle File Save to Code As operation"""
+        current_nodeeditor = self.getCurrentNodeEditorWidget()
+        if current_nodeeditor is not None:
+            fname, filter = QFileDialog.getSaveFileName(self, 'Save graph to code file', self.getFileDialogDirectory(), self.getCodeFileDialogFilter())
+            if fname == '': return False
+
+            current_nodeeditor.fileSaveToCode(fname)
+            self.statusBar().showMessage("Successfully saved as %s" % current_nodeeditor.filename, 5000)
+
+            return True
+
 
     def onEditUndo(self):
         """Handle Edit Undo operation"""

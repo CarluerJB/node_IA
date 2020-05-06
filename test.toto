@@ -1,0 +1,51 @@
+{
+    "nodes": [
+        {
+            "id": 140423825489536,
+            "type": "<class 'nodeeditor.IA_input_node.CustomNode_Input'>",
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140423825502728
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": 1
+        },
+        {
+            "id": 140423825561864,
+            "type": "<class 'nodeeditor.IA_input_node.CustomNode_Output'>",
+            "inputs": [
+                {
+                    "id": 140423825562032
+                }
+            ],
+            "outputs": [],
+            "content": {
+                "value": "1"
+            },
+            "op_code": 2
+        },
+        {
+            "id": 140423825643000,
+            "type": "<class 'nodeeditor.IA_input_node.CustomNode_InputShape'>",
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140423825643056
+                }
+            ],
+            "content": {},
+            "op_code": 8
+        }
+    ],
+    "edges": [
+        {
+            "id": 140423825642832,
+            "start": 140423825502728,
+            "end": 140423825562032
+        }
+    ]
+}

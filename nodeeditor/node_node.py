@@ -561,6 +561,21 @@ class Node(Serializable):
         return outs
 
 
+    # codealize functions
+
+    def codealize(self) -> OrderedDict:
+        inputs, outputs = [], []
+        for socket in self.inputs: inputs.append(socket.codealize())
+        for socket in self.outputs: outputs.append(socket.codealize())
+        ser_content = self.content.serialize() if isinstance(self.content, Serializable) else {}
+        return OrderedDict([
+            ('id', self.id),
+            ('type', str(type(self))),
+            ('inputs', inputs),
+            ('outputs', outputs),
+            ('content', ser_content),
+        ])
+
     # serialization functions
 
     def serialize(self) -> OrderedDict:

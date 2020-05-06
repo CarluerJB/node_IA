@@ -193,6 +193,11 @@ class Socket(Serializable):
         else:
             # probably older version of file, make RIGHT socket multiedged by default
             return data['position'] in (RIGHT_BOTTOM, RIGHT_TOP)
+    
+    def codealize(self) -> OrderedDict:
+        return OrderedDict([
+            ('id', self.id),
+        ])
 
     def serialize(self) -> OrderedDict:
         return OrderedDict([

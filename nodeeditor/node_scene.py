@@ -44,6 +44,7 @@ class Scene(Serializable):
         # custom flag used to suppress triggering onItemSelected which does a bunch of stuff
         self._silent_selection_events = False
 
+        self.has_been_modified_code = False
         self._has_been_modified = False
         self._last_selected_items = []
 
@@ -311,6 +312,26 @@ class Scene(Serializable):
             print("saving to", filename, "was successfull.")
 
             self.has_been_modified = False
+    
+    def saveToCodeFile(self, filename:str):
+        """
+        Save this `Scene` to the code file on disk.
+
+        :param filename: where to save this scene
+        :type filename: ``str``
+        """
+        # HERE WE USE THE SERIALIZED SCENE (NEED SERIALIZE OVERLOAD FOR EACH NODE
+        # IN IA_NODE). Once the operation done we can get node type + content + 
+        # connection information and then transform the whole thing to code
+        DictOfScene = self.codealize()
+        print(DictOfScene)
+
+        with open(filename, "w") as file:
+            
+            file.write( json.dumps( self.codealize(), indent=4 ) )
+            print("saving to", filename, "was successfull.")
+
+            self.has_been_modified_code = False
 
     def loadFromFile(self, filename:str):
         """
@@ -356,6 +377,14 @@ class Scene(Serializable):
         """
         return Node if self.node_class_selector is None else self.node_class_selector(data)
 
+    def codealize(self) -> OrderedDict:
+        nodes, edges = [], []
+        for node in self.nodes: nodes.append(node.codealize())
+        for edge in self.edges: edges.append(edge.codealize())
+        return OrderedDict([
+            ('nodes', nodes),
+            ('edges', edges),
+        ])
 
     def serialize(self) -> OrderedDict:
         nodes, edges = [], []

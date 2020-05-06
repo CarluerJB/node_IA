@@ -29,6 +29,7 @@ class NodeEditorWidget(QWidget):
         super().__init__(parent)
 
         self.filename = None
+        self.codefilename = None
 
         self.initUI()
 
@@ -63,6 +64,14 @@ class NodeEditorWidget(QWidget):
         :rtype: ''bool''
         """
         return self.filename is not None
+    
+    def isCodeFilenameSet(self) -> bool:
+        """Do we have graph loaded from Code file or new one?
+
+        :return: ``True`` if codefilename is set. ``False`` if its a graph not saved to a code file
+        :rtype: ''bool''
+        """
+        return self.codefilename is not None
 
     def getSelectedItems(self) -> list:
         """Shortcut returning `Scene`'s currently selected items
@@ -143,6 +152,18 @@ class NodeEditorWidget(QWidget):
         if filename is not None: self.filename = filename
         QApplication.setOverrideCursor(Qt.WaitCursor)
         self.scene.saveToFile(self.filename)
+        QApplication.restoreOverrideCursor()
+        return True
+    
+    def fileSaveToCode(self, codefilename:str=None):
+        """Save graph to Code file. When called with empty parameter, we won't store/remember the codefilename
+
+        :param codefilename: code file to store the graph
+        :type codefilename: ``str``
+        """
+        if codefilename is not None: self.codefilename = codefilename
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.scene.saveToCodeFile(self.codefilename)
         QApplication.restoreOverrideCursor()
         return True
 

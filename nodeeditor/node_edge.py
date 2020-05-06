@@ -233,6 +233,12 @@ class Edge(Serializable):
 
         except Exception as e: dumpException(e)
 
+    def codealize(self) -> OrderedDict:
+        return OrderedDict([
+            ('id', self.id),
+            ('start', self.start_socket.id if self.start_socket is not None else None),
+            ('end', self.end_socket.id if self.end_socket is not None else None),
+        ])
 
     def serialize(self) -> OrderedDict:
         return OrderedDict([

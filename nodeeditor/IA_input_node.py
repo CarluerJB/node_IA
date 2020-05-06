@@ -106,6 +106,11 @@ class CustomOutputContent(QDMNodeContentWidget):
         self.lbl = QLabel('42', self)
         self.lbl.setAlignment(Qt.AlignLeft)
         self.lbl.setObjectName(self.node.content_label_objname)
+    
+    def serialize(self):
+        res = super().serialize()
+        res['value'] = self.lbl.text()
+        return res
 
 @register_node(OP_NODE_OUTPUT)
 class CustomNode_Output(CustomNode):
@@ -342,7 +347,7 @@ class CustomActivationContent(QDMNodeContentWidget):
         self.comboBox.activated[str].connect(self.style_choice)
         self.setLayout(self.layout)
         self.layout.addWidget(self.comboBox, Qt.AlignLeft)
-        self.initHeight=self.node.grNode.height
+        #self.initHeight=self.node.grNode.height
     
     def style_choice(self, type_choosen):
         print(type_choosen)
@@ -361,7 +366,7 @@ class CustomActivationContent(QDMNodeContentWidget):
             self.edit.setObjectName(self.node.content_label_objname)
             self.layout.addWidget(self.lbl)
             self.layout.addWidget(self.edit)
-            self.node.grNode.height = self.initHeight+self.edit.size().height() + self.lbl.size().height()
+            self.node.grNode.height = self.node.grNode.height+self.edit.size().height() + self.lbl.size().height()
 
         
 

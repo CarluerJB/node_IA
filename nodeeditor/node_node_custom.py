@@ -60,6 +60,12 @@ class CustomNode(Node):
         self.content = CustomContent(self)
         self.grNode = CustomGraphicsNode(self)
     
+    
+    def codealize(self):
+        res = super().codealize()
+        res['op_code'] = self.__class__.op_code
+        return res
+    
     def serialize(self):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
