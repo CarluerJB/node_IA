@@ -1,51 +1,84 @@
 {
     "nodes": [
         {
-            "id": 140423825489536,
-            "type": "<class 'nodeeditor.IA_input_node.CustomNode_Input'>",
-            "inputs": [],
-            "outputs": [
-                {
-                    "id": 140423825502728
-                }
-            ],
-            "content": {
-                "value": "1"
-            },
-            "op_code": 1
-        },
-        {
-            "id": 140423825561864,
-            "type": "<class 'nodeeditor.IA_input_node.CustomNode_Output'>",
-            "inputs": [
-                {
-                    "id": 140423825562032
-                }
-            ],
-            "outputs": [],
-            "content": {
-                "value": "1"
-            },
-            "op_code": 2
-        },
-        {
-            "id": 140423825643000,
+            "id": 140488164198864,
             "type": "<class 'nodeeditor.IA_input_node.CustomNode_InputShape'>",
             "inputs": [],
             "outputs": [
                 {
-                    "id": 140423825643056
+                    "id": 140488164274768,
+                    "index": 0
                 }
             ],
             "content": {},
-            "op_code": 8
+            "op_code": 8,
+            "tfrepr": "keras.layers.Input((0,0))"
+        },
+        {
+            "id": 140488198017168,
+            "type": "<class 'nodeeditor.IA_input_node.CustomNode_InputShape'>",
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140488164274704,
+                    "index": 0
+                }
+            ],
+            "content": {},
+            "op_code": 8,
+            "tfrepr": "keras.layers.Input((0,0))"
+        },
+        {
+            "id": 140488164275088,
+            "type": "<class 'nodeeditor.IA_input_node.CustomNode_Add'>",
+            "inputs": [
+                {
+                    "id": 140488164274832,
+                    "index": 0
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140488164274896,
+                    "index": 0
+                }
+            ],
+            "content": {},
+            "op_code": 6,
+            "tfrepr": "keras.layers.Add()"
+        },
+        {
+            "id": 140488164275216,
+            "type": "<class 'nodeeditor.IA_input_node.CustomNode_Output'>",
+            "inputs": [
+                {
+                    "id": 140488164274960,
+                    "index": 0
+                }
+            ],
+            "outputs": [],
+            "content": {
+                "value": "42"
+            },
+            "op_code": 2,
+            "tfrepr": "keras.layers.Activation(\"42\")"
         }
     ],
     "edges": [
         {
-            "id": 140423825642832,
-            "start": 140423825502728,
-            "end": 140423825562032
+            "id": 140488164275408,
+            "start": 140488164274768,
+            "end": 140488164274832
+        },
+        {
+            "id": 140488164276752,
+            "start": 140488164274704,
+            "end": 140488164274832
+        },
+        {
+            "id": 140488164276816,
+            "start": 140488164274896,
+            "end": 140488164274960
         }
     ]
 }

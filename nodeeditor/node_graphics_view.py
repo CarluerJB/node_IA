@@ -59,7 +59,7 @@ class QDMGraphicsView(QGraphicsView):
         self.mode = MODE_NOOP
         self.editingFlag = False
         self.rubberBandDraggingRectangle = False
-        
+
 
         self.last_scene_mouse_position = QPoint(0,0)
         self.zoomInFactor = 1.25
@@ -229,7 +229,7 @@ class QDMGraphicsView(QGraphicsView):
                 except:
                     self.mode = MODE_NOOP
                     super().mousePressEvent(event)
-                
+
 
         if self.mode == MODE_EDGE_DRAG:
             try:
@@ -315,7 +315,7 @@ class QDMGraphicsView(QGraphicsView):
     def rightMouseButtonPress(self, event:QMouseEvent):
         """When Right mouse button was pressed"""
         super().mousePressEvent(event)
-        
+
 
 
     def rightMouseButtonRelease(self, event:QMouseEvent):
@@ -467,7 +467,7 @@ class QDMGraphicsView(QGraphicsView):
             if isinstance(item, QDMGraphicsSocket):
                 if item.socket != self.drag_start_socket:
                     # if we released dragging on a socket (other then the beginning socket)
-                    if self.drag_start_socket.node.is_compatible(item.socket, self.drag_start_socket):
+                    if True: #self.drag_start_socket.node.is_compatible(item.socket, self.drag_start_socket):
 
                         # we wanna keep all the edges comming from target socket
                         if not item.socket.is_multi_edges:
@@ -532,4 +532,3 @@ class QDMGraphicsView(QGraphicsView):
         # set scene scale
         if not clamped or self.zoomClamp is False:
             self.scale(zoomFactor, zoomFactor)
-

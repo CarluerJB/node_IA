@@ -13,6 +13,7 @@ from nodeeditor.node_edge import Edge
 from nodeeditor.node_scene_history import SceneHistory
 from nodeeditor.node_scene_clipboard import SceneClipboard
 
+from nodeeditor.saveToTF import generateNodeTree, generateStr
 
 DEBUG_REMOVE_WARNINGS = False
 
@@ -228,7 +229,7 @@ class Scene(Serializable):
         :type node: :class:`~nodeeditor.node_node.Node`
         """
         self.nodes.append(node)
-    
+
     def addInputs(self, node:Node):
         """Add :class:`~nodeeditor.node_node.Node` to this `Scene`
 
@@ -236,7 +237,7 @@ class Scene(Serializable):
         :type node: :class:`~nodeeditor.node_node.Node`
         """
         self.node_inputs.append(node)
-    
+
     def addOutputs(self, node:Node):
         """Add :class:`~nodeeditor.node_node.Node` to this `Scene`
 
@@ -244,7 +245,7 @@ class Scene(Serializable):
         :type node: :class:`~nodeeditor.node_node.Node`
         """
         self.node_outputs.append(node)
-    
+
     def removeInputs(self, node:Node):
         """Remove :class:`~nodeeditor.node_node.Node` from this `Scene`
 
@@ -252,7 +253,7 @@ class Scene(Serializable):
         :type node: :class:`~nodeeditor.node_node.Node`
         """
         if node in self.node_inputs: self.node_inputs.remove(node)
-    
+
     def removeOutputs(self, node:Node):
         """Remove :class:`~nodeeditor.node_node.Node` from this `Scene`
 
@@ -312,7 +313,7 @@ class Scene(Serializable):
             print("saving to", filename, "was successfull.")
 
             self.has_been_modified = False
-    
+
     def saveToCodeFile(self, filename:str):
         """
         Save this `Scene` to the code file on disk.
@@ -321,14 +322,18 @@ class Scene(Serializable):
         :type filename: ``str``
         """
         # HERE WE USE THE SERIALIZED SCENE (NEED SERIALIZE OVERLOAD FOR EACH NODE
-        # IN IA_NODE). Once the operation done we can get node type + content + 
+        # IN IA_NODE). Once the operation done we can get node type + content +
         # connection information and then transform the whole thing to code
         DictOfScene = self.codealize()
         print(DictOfScene)
 
+        nodetree = generateNodeTree(DictOfScene)
+        print(nodetree)
+
         with open(filename, "w") as file:
-            
-            file.write( json.dumps( self.codealize(), indent=4 ) )
+
+            #file.write( json.dumps( self.codealize(), indent=4 ) )
+            file.write(generateStr(nodetree))
             print("saving to", filename, "was successfull.")
 
             self.has_been_modified_code = False

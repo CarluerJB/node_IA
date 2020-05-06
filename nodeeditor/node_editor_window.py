@@ -51,13 +51,13 @@ class NodeEditorWindow(QMainWindow):
         self.scene = self.tabs_project.model_tab.nodeEditor.scene
 
         # set window properties
-        # self.setGeometry(200, 200, 800, 600)
+        self.setGeometry(200, 200, 1600, 600)
         self.setTitle()
         #self.showMaximized()
         self.show()
-    
+
     def contextMenuEvent(self, event):
-        
+
         try:
             item=self.scene.getView().getItemAtClick(event)
             print(event.pos())
@@ -101,7 +101,7 @@ class NodeEditorWindow(QMainWindow):
             event.acceptProposedAction()
         else:
             event.setAccepted(False)
-    
+
     def onDrop(self, event):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             eventData=event.mimeData().data(LISTBOX_MIMETYPE)
@@ -121,7 +121,7 @@ class NodeEditorWindow(QMainWindow):
             except Exception as e: dumpException(e)
         else:
             event.ignore()
-        
+
 
     def sizeHint(self):
         return QSize(800, 600)
@@ -132,12 +132,12 @@ class NodeEditorWindow(QMainWindow):
         self.status_mouse_pos = QLabel("")
         self.statusBar().addPermanentWidget(self.status_mouse_pos)
         self.tabs_project.model_tab.nodeEditor.view.scenePosChanged.connect(self.onScenePosChanged)
-    
+
     def createActions(self):
         """Create basic `File` and `Edit` actions"""
         self.actNew = QAction('&New', self, shortcut='Ctrl+N', statusTip="Create new graph", triggered=self.onFileNew)
         self.actOpen = QAction('&Open', self, shortcut='Ctrl+O', statusTip="Open file", triggered=self.onFileOpen)
-        self.actSave = QAction('&Save', self, shortcut='Ctrl+S', statusTip="Save file", triggered=self.onFileSave)        
+        self.actSave = QAction('&Save', self, shortcut='Ctrl+S', statusTip="Save file", triggered=self.onFileSave)
         self.actSaveAs = QAction('Save &As...', self, shortcut='Ctrl+Shift+S', statusTip="Save file as...", triggered=self.onFileSaveAs)
         self.actSaveToCode = QAction('&Save to code', self, shortcut='Ctrl+T', statusTip="Save node system to code", triggered=self.onFileSaveToCode)
         self.actSaveAsToCode = QAction('&Save to code &As...', self, shortcut='Ctrl+Y', statusTip="Save node system to code as...", triggered=self.onFileSaveToCodeAs)
@@ -253,7 +253,7 @@ class NodeEditorWindow(QMainWindow):
     def getFileDialogFilter(self):
         """Returns ``str`` standard file open/save filter for ``QFileDialog``"""
         return 'Graph (*.json);;All files (*)'
-    
+
     def getCodeFileDialogFilter(self):
         """Returns ``str`` standard file open/save filter for ``QFileDialog``"""
         return 'Python File (*.py);;C++ File (*.cpp) -- NOT IMPLEMENTED;;All files (*)'
@@ -301,7 +301,7 @@ class NodeEditorWindow(QMainWindow):
             if hasattr(current_nodeeditor, "setTitle"): current_nodeeditor.setTitle()
             else: self.setTitle()
             return True
-    
+
     def onFileSaveToCode(self):
         """Handle File Save to Code operation"""
         current_nodeeditor = self.getCurrentNodeEditorWidget()
@@ -311,7 +311,7 @@ class NodeEditorWindow(QMainWindow):
             current_nodeeditor.fileSaveToCode()
             self.statusBar().showMessage("Successfully saved %s" % current_nodeeditor.filename, 5000)
 
-    
+
     def onFileSaveToCodeAs(self):
         """Handle File Save to Code As operation"""
         current_nodeeditor = self.getCurrentNodeEditorWidget()

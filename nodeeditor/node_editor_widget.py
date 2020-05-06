@@ -12,6 +12,7 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_edge import Edge, EDGE_TYPE_BEZIER
 from nodeeditor.node_graphics_view import QDMGraphicsView
 
+from nodeeditor.IA_input_node import CustomNode_InputShape, CustomNode_Output, CustomNode_Add
 
 class NodeEditorWidget(QWidget):
     Scene_class = Scene
@@ -64,7 +65,7 @@ class NodeEditorWidget(QWidget):
         :rtype: ''bool''
         """
         return self.filename is not None
-    
+
     def isCodeFilenameSet(self) -> bool:
         """Do we have graph loaded from Code file or new one?
 
@@ -154,7 +155,7 @@ class NodeEditorWidget(QWidget):
         self.scene.saveToFile(self.filename)
         QApplication.restoreOverrideCursor()
         return True
-    
+
     def fileSaveToCode(self, codefilename:str=None):
         """Save graph to Code file. When called with empty parameter, we won't store/remember the codefilename
 
@@ -170,12 +171,25 @@ class NodeEditorWidget(QWidget):
 
     def addNodes(self):
         """Testing method to create 3 `Nodes` with 3 `Edges` connecting them"""
-        node1 = Node(self.scene, "Input", inputs=[], outputs=[0], n_type=1)
-        node2 = Node(self.scene, "Output", inputs=[1], outputs=[],n_type=2)
-        node3 = Node(self.scene, "My Awesome Node 3", inputs=[2,2,2], outputs=[1], n_type=0)
-        node1.setPos(-350, -250)
-        node2.setPos(-75, 0)
-        node3.setPos(200, -200)
+        node1 = CustomNode_InputShape(self.scene)
+        node2 = CustomNode_InputShape(self.scene)
+        node3 = CustomNode_Add(self.scene)
+        node4 = CustomNode_Output(self.scene)
+
+        node1.setPos(-150, -150)
+        node2.setPos(-150, 0)
+        node3.setPos(200, -50)
+        node4.setPos(500, -50)
+
+        edge1 = Edge(self.scene, node1.outputs[0], node3.inputs[0], EDGE_TYPE_BEZIER)
+        node1.onEdgeConnectionChanged(edge1)
+        node3.onEdgeConnectionChanged(edge1)
+        edge2 = Edge(self.scene, node2.outputs[0], node3.inputs[0], EDGE_TYPE_BEZIER)
+        node2.onEdgeConnectionChanged(edge2)
+        node3.onEdgeConnectionChanged(edge2)
+        edge3 = Edge(self.scene, node3.outputs[0], node4.inputs[0], EDGE_TYPE_BEZIER)
+        node3.onEdgeConnectionChanged(edge3)
+        node4.onEdgeConnectionChanged(edge3)
 
         self.scene.history.storeInitialHistoryStamp()
 
@@ -228,4 +242,3 @@ class NodeEditorWidget(QWidget):
         line = self.grScene.addLine(-200, -200, 400, -100, outlinePen)
         line.setFlag(QGraphicsItem.ItemIsMovable)
         line.setFlag(QGraphicsItem.ItemIsSelectable)
-
