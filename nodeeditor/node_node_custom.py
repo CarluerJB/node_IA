@@ -82,6 +82,9 @@ class CustomNode(Node):
               self.__class__.__name__, "res:", res)
         return res
 
+    def evalOperation(self, array):
+        return 0
+
     def evalImplementation(self):
         inputs = []
         inputs_eval = []

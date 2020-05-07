@@ -8,6 +8,7 @@ from nodeeditor.node_socket import LEFT_BOTTOM, LEFT_CENTER, LEFT_TOP, RIGHT_BOT
 import numpy as np
 import ast
 
+
 @register_node(OP_NODE_OUTPUT)
 class CustomNode_Output(CustomNode):
     icon = "nodeeditor/images/output.png"
@@ -27,41 +28,56 @@ class CustomNode_Output(CustomNode):
         return res
 
     def initInnerClasses(self):
-        self.content = CustomActivationContent(self) #CustomOutputContent(self)
+        self.content = CustomActivationContent(self)
         self.grNode = CustomGraphicsNode(self)
 
-    def initCompatible_InOut(self):
-        self.node_type = OUTPUT_NODE_TYPE
-        self.compat_input = [INPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
-        self.compat_output = []
-
     def evalImplementation(self):
-        input_node = self.getInput(0)
-        if not input_node:
-            self.grNode.setToolTip("Input is not connected")
-            self.markInvalid()
-            return
 
-        val = input_node.eval()
-
-        if val is None:
-            self.grNode.setToolTip("Input is NaN")
-            self.markInvalid()
-            return
-
-        self.content.lbl.setText("%d" % val)
         self.markInvalid(False)
         self.markDirty(False)
         self.grNode.setToolTip("")
 
-        return val
+        INodes = self.getInputs()
+
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                self.grNode.setToolTip("WARNING : Bad input shape !")
+                self.shape = None
+                return
+
+        self.shape = np.array(INodes[0].shape)
+
+class CustomDenseGraphic(CustomGraphicsNode):
+    def initSizes(self):
+        super().initSizes()
+        self.height = 85
 
 
 class CustomDenseContent(QDMNodeContentWidget):
     def initUI(self):
-        self.edit = QLineEdit('1', self)
-        self.edit.setAlignment(Qt.AlignLeft)
-        self.edit.setObjectName(self.node.content_label_objname)
+        self.VL = QVBoxLayout(self)
+
+        self.HL = QHBoxLayout(self)
+        self.label = QLabel("Units :", self)
+        self.HL.addWidget(self.label)
+        self.units = QSpinBox(self)
+        self.units.setMinimum(1)
+        self.units.setMaximum(2147483647)
+        self.units.setAlignment(Qt.AlignRight)
+        self.units.setObjectName(self.node.content_label_objname)
+        self.HL.addWidget(self.units)
+
+        self.VL.addLayout(self.HL)
+
+        self.HL2 = QHBoxLayout(self)
+        self.label2 = QLabel("Use bias ? :", self)
+        self.HL2.addWidget(self.label2)
+        self.usebias = QCheckBox(self)
+        self.usebias.setChecked(True)
+        self.HL2.addWidget(self.usebias)
+
+        self.VL.addLayout(self.HL2)
 
 
 @register_node(OP_NODE_DENSE)
@@ -77,13 +93,44 @@ class CustomNode_Dense(CustomNode):
 
     def codealize(self):
         res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Dense("' + self.content.edit.text() + '")'
+        res['tfrepr'] = 'keras.layers.Dense(units=' + str(self.content.units.value()) + ', use_bias=' + ('True' if self.content.usebias.isChecked() else 'False') + ')'
         res['type'] = "hidden"
         return res
 
     def initInnerClasses(self):
         self.content = CustomDenseContent(self)
-        self.grNode = CustomGraphicsNode(self)
+        self.grNode = CustomDenseGraphic(self)
+        self.content.units.valueChanged.connect(self.evalImplementation)
+
+    def evalImplementation(self):
+
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+
+        INodes = self.getInputs()
+
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                self.grNode.setToolTip("WARNING : Bad input shape !")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        if len(INodes) == 0:
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
+            self.shape = None
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        self.shape = np.array(INodes[0].shape)
+        self.shape[-1] = self.content.units.value()
+        for nn in self.getOutputs():
+            nn.evalImplementation()
 
 
 class CustomConcatContent(QDMNodeContentWidget):
@@ -97,7 +144,7 @@ class CustomConcatContent(QDMNodeContentWidget):
 class CustomNode_Concat(CustomNode):
     icon = ""
     op_code = OP_NODE_CONCAT
-    op_title = "Concat"
+    op_title = "Concatenate"
     content_label = ""
     content_label_objname = "custom_node_concat"
 
@@ -115,9 +162,59 @@ class CustomNode_Concat(CustomNode):
         self.input_multi_edged = True
 
     def initInnerClasses(self):
-        self.content = CustomDenseContent(self)
+        #self.content = CustomDenseContent(self)
         self.grNode = CustomGraphicsNode(self)
 
+    def evalImplementation(self):
+
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+
+        INodes = self.getInputs()
+
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                self.grNode.setToolTip("WARNING : Bad input shape !")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        if len(INodes) == 0:
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
+            self.shape = None
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        if len(INodes) == 1:
+            self.markDirty(True)
+            self.grNode.setToolTip("WARNING : Usualy needs two or more Inputs. May be an Error!")
+            self.shape = np.array(INodes[0].shape)
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        firstshape = INodes[0].shape
+        for node in INodes[1:]:
+            print(node)
+            if len(node.shape) != len(firstshape) or (node.shape[:-1] != firstshape[:-1]).any():
+                self.markInvalid(True)
+                self.grNode.setToolTip("ERROR : Input shape mismatch!")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        self.shape = np.array(INodes[0].shape)
+        for node in INodes[1:]:
+            self.shape[-1] += node.shape[-1]
+
+        for nn in self.getOutputs():
+            nn.evalImplementation()
 
 @register_node(OP_NODE_ADD)
 class CustomNode_Add(CustomNode):
@@ -139,7 +236,6 @@ class CustomNode_Add(CustomNode):
     def initSettings(self):
         super().initSettings()
         self.socket_spacing = 25
-
         self.input_socket_position = LEFT_TOP
         self.output_socket_position = RIGHT_TOP
         self.input_multi_edged = True
@@ -147,22 +243,61 @@ class CustomNode_Add(CustomNode):
     def initInnerClasses(self):
         self.grNode = CustomGraphicsNode(self)
 
-    def initCompatible_InOut(self):
-        self.node_type = ADD_NODE_TYPE
-        self.compat_input = [INPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
-        self.compat_output = [OUTPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
+    def evalImplementation(self):
 
-    def evalOperation(self, inputs):
-        print(inputs)
-        # Here check for same shape of inputs => else mark invalid + msg
-        return np.sum(inputs)
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+
+        INodes = self.getInputs()
+        print(INodes)
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                self.grNode.setToolTip("WARNING : Bad input shape !")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        if len(INodes) == 0:
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
+            self.shape = None
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        if len(INodes) == 1:
+            self.markDirty(True)
+            self.grNode.setToolTip("WARNING : Usualy needs two or more Inputs. May be an Error!")
+            self.shape = np.array(INodes[0].shape)
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        firstshape = INodes[0].shape
+        for node in INodes[1:]:
+            if not ((len(node.shape) == len(firstshape)) and (node.shape == firstshape).all()):
+                self.markInvalid(True)
+                self.grNode.setToolTip("ERROR : Input shape mismatch!")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        self.shape = np.array(INodes[0].shape)
+        for nn in self.getOutputs():
+            nn.evalImplementation()
+
+
 
 
 @register_node(OP_NODE_PROD)
 class CustomNode_Prod(CustomNode):
     icon = ""
     op_code = OP_NODE_PROD
-    op_title = "Prod"
+    op_title = "Multiply"
     content_label = ""
     content_label_objname = "custom_node_prod"
 
@@ -178,27 +313,65 @@ class CustomNode_Prod(CustomNode):
     def initSettings(self):
         super().initSettings()
         self.socket_spacing = 25
-
         self.input_socket_position = LEFT_TOP
         self.output_socket_position = RIGHT_TOP
         self.input_multi_edged = True
 
-
     def initInnerClasses(self):
         self.grNode = CustomGraphicsNode(self)
 
-    def initCompatible_InOut(self):
-        self.node_type = PROD_NODE_TYPE
-        self.compat_input = [INPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
-        self.compat_output = [OUTPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
+    def evalImplementation(self):
 
-    def evalOperation(self, inputs):
-        return np.prod(inputs)
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+
+        INodes = self.getInputs()
+
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                self.grNode.setToolTip("WARNING : Bad input shape !")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        if len(INodes) == 0:
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
+            self.shape = None
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        if len(INodes) == 1:
+            self.markDirty(True)
+            self.grNode.setToolTip("WARNING : Usualy needs two or more Inputs. May be an Error!")
+            self.shape = np.array(INodes[0].shape)
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        firstshape = INodes[0].shape
+        for node in INodes[1:]:
+            print(node)
+            if len(node.shape) != len(firstshape) or (node.shape != firstshape).any():
+                self.markInvalid(True)
+                self.grNode.setToolTip("ERROR : Input shape mismatch!")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        self.shape = np.array(INodes[0].shape)
+        for nn in self.getOutputs():
+            nn.evalImplementation()
 
 
 class CustomInputShapeContent(QDMNodeContentWidget):
     def initUI(self):
-        self.edit = QLineEdit('(0,0)', self)
+        self.edit = QLineEdit('(0, 0)', self)
         self.edit.setAlignment(Qt.AlignRight)
         self.edit.setObjectName(self.node.content_label_objname)
 
@@ -213,6 +386,8 @@ class CustomNode_Input(CustomNode):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[2])
+        self.shape = None
+        self.evalImplementation()
 
     def codealize(self):
         res = super().codealize()
@@ -223,7 +398,6 @@ class CustomNode_Input(CustomNode):
     def initSettings(self):
         super().initSettings()
         self.socket_spacing = 25
-
         self.input_socket_position = LEFT_TOP
         self.output_socket_position = RIGHT_TOP
         self.input_multi_edged = False
@@ -236,39 +410,29 @@ class CustomNode_Input(CustomNode):
         self.grNode = CustomGraphicsNode(self)
         self.content.edit.textChanged.connect(self.onInputChanged)
 
-    def initCompatible_InOut(self):
-        self.node_type = INPUTSHAPE_NODE_TYPE
-        self.compat_input = []
-        self.compat_output = [OUTPUT_NODE_TYPE, ADD_NODE_TYPE, PROD_NODE_TYPE]
-
     def evalImplementation(self):
-        u_value = self.content.edit.text()
-        try:
-            s_value = ast.literal_eval(u_value)
-            print(s_value)
-            a = np.array(s_value)
-            print(a.shape[0])
-        except:
-            pass
-        self.value = 3
-        self.markDirty(False)
+
         self.markInvalid(False)
-
-        self.markDescendantsInvalid(False)
-        self.markDescendantsDirty()
-
+        self.markDirty(False)
         self.grNode.setToolTip("")
 
-        self.evalChildren()
+        try:
+            s_value = ast.literal_eval(self.content.edit.text())
+            self.shape = np.array(s_value)
+        except:
+            self.shape = None
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Invalid shape !")
 
-        return self.value
+        for nn in self.getOutputs():
+            nn.evalImplementation()
 
 
 class CustomActivationContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
         self.comboBox = QComboBox(self)
-        #self.comboBox.addItem("None")
+        # self.comboBox.addItem("None")
         self.comboBox.addItem("elu")
         self.comboBox.addItem("softmax")
         self.comboBox.addItem("selu")
@@ -325,7 +489,6 @@ class CustomNode_Activation(CustomNode):
     def initInnerClasses(self):
         self.content = CustomActivationContent(self)
         self.grNode = CustomGraphicsNode(self)
-
 
 
 # register_node_now(OP_NODE_INPUT, CustomNode_Input)
