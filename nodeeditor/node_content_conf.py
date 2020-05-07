@@ -8,11 +8,12 @@ OP_NODE_DENSE = 4
 OP_NODE_CONCAT = 5
 OP_NODE_ADD = 6
 OP_NODE_PROD = 7
-OP_NODE_INPUTSHAPE = 8
-OP_NODE_ACTIVATION = 9
+OP_NODE_ACTIVATION = 8
+OP_NODE_CONV1D = 9
+OP_NODE_CONV2D = 10
+OP_NODE_CONV3D = 11
 
-CUSTOM_NODES = {
-}
+CUSTOM_NODES = {}
 
 class ConfException(Exception): pass
 class InvalidNodeRegistration(ConfException): pass

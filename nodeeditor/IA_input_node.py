@@ -51,7 +51,8 @@ class CustomNode_Output(CustomNode):
 class CustomDenseGraphic(CustomGraphicsNode):
     def initSizes(self):
         super().initSizes()
-        self.height = 85
+        self.height = 105
+        self.width = 170
 
 
 class CustomDenseContent(QDMNodeContentWidget):
@@ -79,6 +80,22 @@ class CustomDenseContent(QDMNodeContentWidget):
 
         self.VL.addLayout(self.HL2)
 
+        self.HL5 = QHBoxLayout(self)
+        self.label5 = QLabel("Activation :", self)
+        self.HL5.addWidget(self.label5)
+        self.activation = QComboBox(self)
+        self.activation.addItem("linear")
+        self.activation.addItem("softmax")
+        self.activation.addItem("softplus")
+        self.activation.addItem("softsign")
+        self.activation.addItem("relu")
+        self.activation.addItem("tanh")
+        self.activation.addItem("sigmoid")
+        self.activation.addItem("hard_sigmoid")
+        self.activation.addItem("exponential")
+        self.HL5.addWidget(self.activation)
+
+        self.VL.addLayout(self.HL5)
 
 @register_node(OP_NODE_DENSE)
 class CustomNode_Dense(CustomNode):
@@ -93,7 +110,10 @@ class CustomNode_Dense(CustomNode):
 
     def codealize(self):
         res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Dense(units=' + str(self.content.units.value()) + ', use_bias=' + ('True' if self.content.usebias.isChecked() else 'False') + ')'
+        res['tfrepr'] = 'keras.layers.Dense(units=' + str(self.content.units.value()) + \
+            ', use_bias=' + ('True' if self.content.usebias.isChecked() else 'False') + \
+            ', activation="' + self.content.activation.currentText() + '"' + \
+            ')'
         res['type'] = "hidden"
         return res
 
@@ -376,10 +396,10 @@ class CustomInputShapeContent(QDMNodeContentWidget):
         self.edit.setObjectName(self.node.content_label_objname)
 
 
-@register_node(OP_NODE_INPUTSHAPE)
+@register_node(OP_NODE_INPUT)
 class CustomNode_Input(CustomNode):
     icon = "nodeeditor/images/input.png"
-    op_code = OP_NODE_INPUTSHAPE
+    op_code = OP_NODE_INPUT
     op_title = "Input"
     content_label = ""
     content_label_objname = "custom_node_inputShape"
@@ -428,14 +448,379 @@ class CustomNode_Input(CustomNode):
             nn.evalImplementation()
 
 
+class CustomConv1DGraphic(CustomGraphicsNode):
+    def initSizes(self):
+        super().initSizes()
+        self.height = 160
+        self.width = 170
+
+
+class CustomConv1DContent(QDMNodeContentWidget):
+    def initUI(self):
+        self.VL = QVBoxLayout(self)
+
+        self.HL = QHBoxLayout(self)
+        self.label = QLabel("Filters :", self)
+        self.HL.addWidget(self.label)
+        self.filters = QSpinBox(self)
+        self.filters.setMinimum(1)
+        self.filters.setMaximum(2147483647)
+        self.filters.setAlignment(Qt.AlignRight)
+        self.HL.addWidget(self.filters)
+
+        self.VL.addLayout(self.HL)
+
+        self.HL2 = QHBoxLayout(self)
+        self.label2 = QLabel("Kernel Size :", self)
+        self.HL2.addWidget(self.label2)
+        self.kernelsize = QSpinBox(self)
+        self.kernelsize.setMinimum(1)
+        self.kernelsize.setMaximum(2147483647)
+        self.kernelsize.setSingleStep(1)
+        self.kernelsize.setAlignment(Qt.AlignRight)
+        self.HL2.addWidget(self.kernelsize)
+
+        self.VL.addLayout(self.HL2)
+
+        self.HL3 = QHBoxLayout(self)
+        self.label3 = QLabel("Strides :", self)
+        self.HL3.addWidget(self.label3)
+        self.strides = QSpinBox(self)
+        self.strides.setMinimum(1)
+        self.strides.setMaximum(2147483647)
+        self.strides.setSingleStep(1)
+        self.strides.setAlignment(Qt.AlignRight)
+        self.HL3.addWidget(self.strides)
+
+        self.VL.addLayout(self.HL3)
+
+        self.HL4 = QHBoxLayout(self)
+        self.label4 = QLabel("Padding :", self)
+        self.HL4.addWidget(self.label4)
+        self.padding = QComboBox(self)
+        self.padding.addItem("valid")
+        self.padding.addItem("same")
+        self.HL4.addWidget(self.padding)
+
+        self.VL.addLayout(self.HL4)
+
+        self.HL5 = QHBoxLayout(self)
+        self.label5 = QLabel("Activation :", self)
+        self.HL5.addWidget(self.label5)
+        self.activation = QComboBox(self)
+        self.activation.addItem("linear")
+        self.activation.addItem("softmax")
+        self.activation.addItem("softplus")
+        self.activation.addItem("softsign")
+        self.activation.addItem("relu")
+        self.activation.addItem("tanh")
+        self.activation.addItem("sigmoid")
+        self.activation.addItem("hard_sigmoid")
+        self.activation.addItem("exponential")
+        self.HL5.addWidget(self.activation)
+
+        self.VL.addLayout(self.HL5)
+
+@register_node(OP_NODE_CONV1D)
+class CustomNode_Conv1D(CustomNode):
+    icon = ""
+    op_code = OP_NODE_CONV1D
+    op_title = "Conv1D"
+    content_label = ""
+
+    def __init__(self, scene):
+        super().__init__(scene, inputs=[1], outputs=[1])
+
+    def codealize(self):
+        res = super().codealize()
+        res['tfrepr'] = 'keras.layers.Conv1D(filters=' + str(self.content.filters.value()) + \
+            ', kernel_size=' + str(self.content.kernelsize.value()) + \
+            ', strides=' + str(self.content.strides.value()) + \
+            ', padding="' + self.content.padding.currentText() + \
+            ', activation="' + self.content.activation.currentText() + '"' + \
+            '")'
+        res['type'] = "hidden"
+        return res
+
+    def initInnerClasses(self):
+        self.content = CustomConv1DContent(self)
+        self.grNode = CustomConv1DGraphic(self)
+        self.content.filters.valueChanged.connect(self.evalImplementation)
+        self.content.kernelsize.valueChanged.connect(self.evalImplementation)
+        self.content.strides.valueChanged.connect(self.evalImplementation)
+        self.content.padding.currentIndexChanged.connect(self.evalImplementation)
+
+    def evalImplementation(self):
+
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+
+        INodes = self.getInputs()
+
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                self.grNode.setToolTip("WARNING : Bad input shape !")
+                self.shape = None
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        if len(INodes) == 0:
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
+            self.shape = None
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        if len(INodes[0].shape) != 2:
+            self.markInvalid(True)
+            self.grNode.setToolTip("ERROR : Conv1D need input shape of exactly size 2!")
+            self.shape = None
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        self.shape = np.array(INodes[0].shape)
+
+        self.shape[1] = self.content.filters.value()
+
+        self.shape[0] -= (self.content.kernelsize.value() -1) if self.content.padding.currentText() == "valid" else 0
+        self.shape[0] = (self.shape[0] // self.content.strides.value()) + (1 if self.shape[0] % self.content.strides.value() != 0 else 0)
+
+        for nn in self.getOutputs():
+            nn.evalImplementation()
+
+
+class CustomConv2DGraphic(CustomGraphicsNode):
+    def initSizes(self):
+        super().initSizes()
+        self.height = 160
+        self.width = 255
+
+
+class CustomConv2DContent(QDMNodeContentWidget):
+    def initUI(self):
+        self.VL = QVBoxLayout(self)
+
+        self.HL = QHBoxLayout(self)
+        self.label = QLabel("Filters :", self)
+        self.HL.addWidget(self.label)
+        self.filters = QSpinBox(self)
+        self.filters.setMinimum(1)
+        self.filters.setMaximum(2147483647)
+        self.filters.setAlignment(Qt.AlignRight)
+        self.HL.addWidget(self.filters)
+
+        self.VL.addLayout(self.HL)
+
+        self.HL2 = QHBoxLayout(self)
+        self.label2 = QLabel("Kernel Size :", self)
+        self.HL2.addWidget(self.label2)
+        self.kernelsizex = QSpinBox(self)
+        self.kernelsizex.setMinimum(1)
+        self.kernelsizex.setMaximum(2147483647)
+        self.kernelsizex.setSingleStep(1)
+        self.kernelsizex.setAlignment(Qt.AlignRight)
+        self.HL2.addWidget(self.kernelsizex)
+        self.kernelsizey = QSpinBox(self)
+        self.kernelsizey.setMinimum(1)
+        self.kernelsizey.setMaximum(2147483647)
+        self.kernelsizey.setSingleStep(1)
+        self.kernelsizey.setAlignment(Qt.AlignRight)
+        self.HL2.addWidget(self.kernelsizey)
+
+        self.VL.addLayout(self.HL2)
+
+        self.HL3 = QHBoxLayout(self)
+        self.label3 = QLabel("Strides :", self)
+        self.HL3.addWidget(self.label3)
+        self.stridesx = QSpinBox(self)
+        self.stridesx.setMinimum(1)
+        self.stridesx.setMaximum(2147483647)
+        self.stridesx.setSingleStep(1)
+        self.stridesx.setAlignment(Qt.AlignRight)
+        self.HL3.addWidget(self.stridesx)
+        self.stridesy = QSpinBox(self)
+        self.stridesy.setMinimum(1)
+        self.stridesy.setMaximum(2147483647)
+        self.stridesy.setSingleStep(1)
+        self.stridesy.setAlignment(Qt.AlignRight)
+        self.HL3.addWidget(self.stridesy)
+
+        self.VL.addLayout(self.HL3)
+
+        self.HL4 = QHBoxLayout(self)
+        self.label4 = QLabel("Padding :", self)
+        self.HL4.addWidget(self.label4)
+        self.padding = QComboBox(self)
+        self.padding.addItem("valid")
+        self.padding.addItem("same")
+        self.HL4.addWidget(self.padding)
+
+        self.VL.addLayout(self.HL4)
+
+        self.HL5 = QHBoxLayout(self)
+        self.label5 = QLabel("Activation :", self)
+        self.HL5.addWidget(self.label5)
+        self.activation = QComboBox(self)
+        self.activation.addItem("linear")
+        self.activation.addItem("softmax")
+        self.activation.addItem("softplus")
+        self.activation.addItem("softsign")
+        self.activation.addItem("relu")
+        self.activation.addItem("tanh")
+        self.activation.addItem("sigmoid")
+        self.activation.addItem("hard_sigmoid")
+        self.activation.addItem("exponential")
+        self.HL5.addWidget(self.activation)
+
+        self.VL.addLayout(self.HL5)
+
+@register_node(OP_NODE_CONV2D)
+class CustomNode_Conv2D(CustomNode):
+    icon = ""
+    op_code = OP_NODE_CONV2D
+    op_title = "Conv2D"
+    content_label = ""
+
+    def __init__(self, scene):
+        super().__init__(scene, inputs=[1], outputs=[1])
+
+    def codealize(self):
+        res = super().codealize()
+        res['tfrepr'] = 'keras.layers.Conv2D(filters=' + str(self.content.filters.value()) + \
+            ', kernel_size=(' + str(self.content.kernelsizex.value()) + ', ' + str(self.content.kernelsizey.value()) + ')' + \
+            ', strides=(' + str(self.content.stridesx.value()) + ', ' + str(self.content.stridesy.value()) + ')' + \
+            ', padding="' + self.content.padding.currentText() + '"' + \
+            ', activation="' + self.content.activation.currentText() + '"' + \
+            ')'
+        res['type'] = "hidden"
+        return res
+
+    def initInnerClasses(self):
+        self.content = CustomConv2DContent(self)
+        self.grNode = CustomConv2DGraphic(self)
+        self.content.filters.valueChanged.connect(self.evalImplementation)
+        self.content.kernelsizex.valueChanged.connect(self.evalImplementation)
+        self.content.kernelsizey.valueChanged.connect(self.evalImplementation)
+        self.content.stridesx.valueChanged.connect(self.evalImplementation)
+        self.content.stridesy.valueChanged.connect(self.evalImplementation)
+        self.content.padding.currentIndexChanged.connect(self.evalImplementation)
+
+    def evalImplementation(self):
+
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+
+        self.content.label2.setStyleSheet("color : white;")
+        self.content.label2.setToolTip("")
+        self.content.label3.setStyleSheet("color : white;")
+
+        self.content.kernelsizex.setStyleSheet("background-color: white;")
+        self.content.kernelsizex.setToolTip("")
+        self.content.kernelsizey.setStyleSheet("background-color: white;")
+        self.content.kernelsizey.setToolTip("")
+
+        grNodeToolTip = ""
+
+        if self.content.kernelsizex.value() % 2 == 0:
+            self.content.kernelsizex.setStyleSheet("background-color: yellow;")
+            self.content.kernelsizex.setToolTip("WARNING : kernel size should be odd, this is usualy an error")
+            grNodeToolTip += "WARNING : even Kernel size at pos 1\n"
+
+        if self.content.kernelsizey.value() % 2 == 0:
+            self.content.kernelsizey.setStyleSheet("background-color: yellow;")
+            self.content.kernelsizey.setToolTip("WARNING : kernel size should be odd, this is usualy an error")
+            grNodeToolTip += "WARNING : even Kernel size at pos 2\n"
+
+        if self.content.kernelsizex.value() != self.content.kernelsizey.value():
+            self.content.label2.setStyleSheet("color : red;")
+            self.content.label2.setToolTip("WARNING : kernel size of different values, this is usualy an error")
+            grNodeToolTip += "WARNING : Kernel size of different values\n"
+
+        if self.content.stridesx.value() != self.content.stridesy.value():
+            self.content.label3.setStyleSheet("color : red;")
+            self.content.label3.setToolTip("WARNING : strides of different values, this is usualy an error")
+            grNodeToolTip += "WARNING : strides of different values\n"
+
+        INodes = self.getInputs()
+
+        for node in INodes:
+            if node.shape is None:
+                self.markDirty(True)
+                grNodeToolTip += "WARNING : Bad input shape !"
+                self.grNode.setToolTip(grNodeToolTip)
+                self.shape = None
+                self.outputs[0].grSocket.setToolTip(str(self.shape))
+                for nn in self.getOutputs():
+                    nn.evalImplementation()
+                return
+
+        if len(INodes) == 0:
+            self.markInvalid(True)
+            grNodeToolTip += "ERROR : Hidden Node with no Inputs!"
+            self.grNode.setToolTip(grNodeToolTip)
+            self.shape = None
+            self.outputs[0].grSocket.setToolTip(str(self.shape))
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        for node in INodes:
+            for val in node.shape:
+                if val == None:
+                    grNodeToolTip += "INFO : Input shape contains None size\n"
+                    self.inputs[0].grSocket.setToolTip("INFO : Input shape contains None size\n")
+                    break
+
+        if len(INodes[0].shape) != 3:
+            self.markInvalid(True)
+            grNodeToolTip += "ERROR : Conv2D need input shape of exactly size 3!"
+            self.grNode.setToolTip(grNodeToolTip)
+            self.shape = None
+            self.outputs[0].grSocket.setToolTip(str(self.shape))
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+            return
+
+        self.shape = np.array(INodes[0].shape)
+
+        self.shape[2] = self.content.filters.value()
+
+        if self.shape[0] != None:
+            self.shape[0] -= (self.content.kernelsizex.value() -1) if self.content.padding.currentText() == "valid" else 0
+            self.shape[0] = (self.shape[0] // self.content.stridesx.value()) + (1 if self.shape[0] % self.content.stridesx.value() != 0 else 0)
+        else:
+            self.shape[0] = None
+
+        if self.shape[1] != None:
+            self.shape[1] -= (self.content.kernelsizey.value() -1) if self.content.padding.currentText() == "valid" else 0
+            self.shape[1] = (self.shape[1] // self.content.stridesy.value()) + (1 if self.shape[1] % self.content.stridesy.value() != 0 else 0)
+        else:
+            self.shape[1] = None
+
+        self.grNode.setToolTip(grNodeToolTip)
+
+        self.outputs[0].grSocket.setToolTip(str(self.shape))
+
+        for nn in self.getOutputs():
+            nn.evalImplementation()
+
+
+
 class CustomActivationContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
         self.comboBox = QComboBox(self)
         # self.comboBox.addItem("None")
-        self.comboBox.addItem("elu")
+        #self.comboBox.addItem("elu")
+        self.comboBox.addItem("linear")
         self.comboBox.addItem("softmax")
-        self.comboBox.addItem("selu")
+        #self.comboBox.addItem("selu")
         self.comboBox.addItem("softplus")
         self.comboBox.addItem("softsign")
         self.comboBox.addItem("relu")
@@ -443,36 +828,35 @@ class CustomActivationContent(QDMNodeContentWidget):
         self.comboBox.addItem("sigmoid")
         self.comboBox.addItem("hard_sigmoid")
         self.comboBox.addItem("exponential")
-        self.comboBox.addItem("linear")
-        self.comboBox.addItem("LeakyReLu")
-        self.comboBox.addItem("PReLu")
-        self.comboBox.addItem("ThresholdedReLU")
-        self.comboBox.setObjectName(self.node.content_label_objname)
-        self.comboBox.activated[str].connect(self.style_choice)
+        #self.comboBox.addItem("LeakyReLu")
+        #self.comboBox.addItem("PReLu")
+        #self.comboBox.addItem("ThresholdedReLU")
+        #self.comboBox.setObjectName(self.node.content_label_objname)
+        #self.comboBox.activated[str].connect(self.style_choice)
         self.setLayout(self.layout)
         self.layout.addWidget(self.comboBox, Qt.AlignLeft)
         # self.initHeight=self.node.grNode.height
 
-    def style_choice(self, type_choosen):
-        print(type_choosen)
-        if type_choosen == "elu":
-            self.lbl = QLabel('alpha : ', self)
-            self.edit = QLineEdit('0.0', self)
-            self.edit.setAlignment(Qt.AlignRight)
-            self.edit.setObjectName(self.node.content_label_objname)
-            self.layout.addWidget(self.lbl)
-            self.layout.addWidget(self.edit)
-            self.node.grNode.height = self.initHeight+self.edit.size().height() + \
-                self.lbl.size().height()
-        elif type_choosen == "softmax":
-            self.lbl = QLabel('axis : ', self)
-            self.edit = QLineEdit('0', self)
-            self.edit.setAlignment(Qt.AlignRight)
-            self.edit.setObjectName(self.node.content_label_objname)
-            self.layout.addWidget(self.lbl)
-            self.layout.addWidget(self.edit)
-            self.node.grNode.height = self.node.grNode.height + \
-                self.edit.size().height() + self.lbl.size().height()
+    # def style_choice(self, type_choosen):
+    #     print(type_choosen)
+    #     if type_choosen == "elu":
+    #         self.lbl = QLabel('alpha : ', self)
+    #         self.edit = QLineEdit('0.0', self)
+    #         self.edit.setAlignment(Qt.AlignRight)
+    #         self.edit.setObjectName(self.node.content_label_objname)
+    #         self.layout.addWidget(self.lbl)
+    #         self.layout.addWidget(self.edit)
+    #         self.node.grNode.height = self.initHeight+self.edit.size().height() + \
+    #             self.lbl.size().height()
+    #     elif type_choosen == "softmax":
+    #         self.lbl = QLabel('axis : ', self)
+    #         self.edit = QLineEdit('0', self)
+    #         self.edit.setAlignment(Qt.AlignRight)
+    #         self.edit.setObjectName(self.node.content_label_objname)
+    #         self.layout.addWidget(self.lbl)
+    #         self.layout.addWidget(self.edit)
+    #         self.node.grNode.height = self.node.grNode.height + \
+    #             self.edit.size().height() + self.lbl.size().height()
 
 
 @register_node(OP_NODE_ACTIVATION)
