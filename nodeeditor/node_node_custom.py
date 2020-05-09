@@ -53,10 +53,43 @@ class CustomNode(Node):
     content_label = ""
     content_label_objname = "calc_node_bg"
     def __init__(self, scene, inputs=[2, 2], outputs=[2, 2]):
-
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
         self.value = None
-        self.markDirty()
+        self.shape = None
+        self.grNodeToolTip = ""
+        self.updatetfrepr()
+        self.setType()
+        self.evalImplementation()
+
+    def setType(self):
+        self.type = "hidden"
+
+    def updatetfrepr(self):
+        self.tfrepr = "pass"
+
+    def addInfo(self, message: str, which=None, stylesheet=None):
+        self.grNodeToolTip += "INFO : " + message + "\n"
+        if which is not None:
+            which.setToolTip("INFO : " + message)
+            if stylesheet is not None:
+                which.setStyleSheet(stylesheet)
+
+    def addWarning(self, message: str, which=None, stylesheet=None):
+        self.markDirty(True)
+        self.grNodeToolTip += "WARNING : " + message + "\n"
+        if which is not None:
+            which.setToolTip("WARNING : " + message)
+            if stylesheet is not None:
+                which.setStyleSheet(stylesheet)
+
+
+    def addError(self, message: str, which=None, stylesheet=None):
+        self.markInvalid(True)
+        self.grNodeToolTip += "ERROR : " + message + "\n"
+        if which is not None:
+            which.setToolTip("ERROR : " + message)
+            if stylesheet is not None:
+                which.setStyleSheet(stylesheet)
 
     def initSettings(self):
         super().initSettings()
@@ -68,7 +101,11 @@ class CustomNode(Node):
 
     def codealize(self):
         res = super().codealize()
+        # update representation
+        self.updatetfrepr()
         res['op_code'] = self.__class__.op_code
+        res['tfrepr'] = self.tfrepr
+        res['type'] = self.type
         return res
 
     def serialize(self):
@@ -85,62 +122,62 @@ class CustomNode(Node):
     def evalOperation(self, array):
         return 0
 
+    def EvalImpl_(self):
+        """
+        Default behavior is : return the same shape as the input one
+        """
+        if self.type != "input":
+            INodes = self.getInputs()
+            self.shape = np.array(INodes[0].shape)
+
+    def endEval(self):
+        self.grNode.setToolTip(self.grNodeToolTip)
+        if self.type != "output":
+            self.outputs[0].grSocket.setToolTip(str(self.shape))
+            for nn in self.getOutputs():
+                nn.evalImplementation()
+
+    def resetAll(self):
+        self.markInvalid(False)
+        self.markDirty(False)
+        self.grNode.setToolTip("")
+        self.grNodeToolTip = ""
+        self.shape = None
+
     def evalImplementation(self):
-        inputs = []
-        inputs_eval = []
-        for i in range(0, len(self.inputs)):
-            inputs.append(self.getInputs(i))
+        self.resetAll()
 
-        if None in inputs:
-            self.markInvalid()
-            self.markDescendantsDirty()
-            self.grNode.setToolTip("Connect all inputs")
-            return None
-        else:
-            for i in range(0, len(inputs)):
-                for edge in inputs[i]:
-                    inputs_eval.append(edge.eval())
-            val = self.evalOperation(np.array(inputs_eval))
-            self.value = val
-            self.markDirty(False)
-            self.markInvalid(False)
-            self.grNode.setToolTip("")
+        if self.type != "input":
+            if len(self.getInputs()) == 0:
+                self.addError("Hidden layer with no Inputs")
+                self.shape = None
+                self.endEval()
+                return
 
-            self.markDescendantsDirty()
-            self.evalChildren()
+            for node in self.getInputs():
+                if node.shape is None:
+                    self.addError("Bad input shape")
+                    self.shape = None
+                    self.endEval()
+                    return
 
-            return val
+            for node in self.getInputs():
+                for val in node.shape:
+                    if val == None:
+                        self.addInfo("Input shape contains None value")
+                        break
 
-    # def evalImplementation(self):
-    #     i1 = self.getInput(0)
-    #     i2 = self.getInput(1)
+        self.EvalImpl_()
 
-    #     if i1 is None or i2 is None:
-    #         self.markInvalid()
-    #         self.markDescendantsDirty()
-    #         self.grNode.setToolTip("Connect all inputs")
-    #         return None
+        self.endEval()
 
-    #     else:
-    #         val = self.evalOperation(i1.eval(), i2.eval())
-    #         self.value = val
-    #         self.markDirty(False)
-    #         self.markInvalid(False)
-    #         self.grNode.setToolTip("")
-
-    #         self.markDescendantsDirty()
-    #         self.evalChildren()
-
-    #         return val
 
     def eval(self):
         if not self.isDirty() and not self.isInvalid():
             print(" _> returning cached %s value:" %
                   self.__class__.__name__, self.value)
             return self.value
-
         try:
-
             val = self.evalImplementation()
             return val
         except ValueError as e:

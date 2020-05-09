@@ -21,39 +21,24 @@ class CustomNode_Output(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[])
         self.scene.addOutputs(self)
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Activation("' + self.content.comboBox.currentText() + '")'
-        res['type'] = "output"
-        return res
+    def setType(self):
+        self.type = "output"
+
+    def updatetfrepr(self):
+        self.tfrepr = 'keras.layers.Activation("' + self.content.activation.currentText() + '")'
 
     def initInnerClasses(self):
         self.content = CustomActivationContent(self)
         self.grNode = CustomGraphicsNode(self)
 
-    def evalImplementation(self):
 
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
 
-        INodes = self.getInputs()
-
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                self.grNode.setToolTip("WARNING : Bad input shape !")
-                self.shape = None
-                return
-
-        self.shape = np.array(INodes[0].shape)
 
 class CustomDenseGraphic(CustomGraphicsNode):
     def initSizes(self):
         super().initSizes()
         self.height = 105
         self.width = 170
-
 
 class CustomDenseContent(QDMNodeContentWidget):
     def initUI(self):
@@ -108,49 +93,23 @@ class CustomNode_Dense(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Dense(units=' + str(self.content.units.value()) + \
+    def updatetfrepr(self):
+        self.tfrepr = 'keras.layers.Dense(units=' + str(self.content.units.value()) + \
             ', use_bias=' + ('True' if self.content.usebias.isChecked() else 'False') + \
             ', activation="' + self.content.activation.currentText() + '"' + \
             ')'
-        res['type'] = "hidden"
-        return res
 
     def initInnerClasses(self):
         self.content = CustomDenseContent(self)
         self.grNode = CustomDenseGraphic(self)
         self.content.units.valueChanged.connect(self.evalImplementation)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
+    def EvalImpl_(self):
         INodes = self.getInputs()
-
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                self.grNode.setToolTip("WARNING : Bad input shape !")
-                self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
-                return
-
-        if len(INodes) == 0:
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
-            self.shape = None
-            for nn in self.getOutputs():
-                nn.evalImplementation()
-            return
-
         self.shape = np.array(INodes[0].shape)
         self.shape[-1] = self.content.units.value()
-        for nn in self.getOutputs():
-            nn.evalImplementation()
+
+
 
 
 class CustomConcatContent(QDMNodeContentWidget):
@@ -158,7 +117,6 @@ class CustomConcatContent(QDMNodeContentWidget):
         self.edit = QLineEdit('1', self)
         self.edit.setAlignment(Qt.AlignLeft)
         self.edit.setObjectName(self.node.content_label_objname)
-
 
 @register_node(OP_NODE_CONCAT)
 class CustomNode_Concat(CustomNode):
@@ -171,11 +129,8 @@ class CustomNode_Concat(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Concatenate()'
-        res['type'] = "hidden"
-        return res
+    def updatetfrepr(self):
+        self.tfrepr = 'keras.layers.Concatenate()'
 
     def initSettings(self):
         super().initSettings()
@@ -185,56 +140,29 @@ class CustomNode_Concat(CustomNode):
         #self.content = CustomDenseContent(self)
         self.grNode = CustomGraphicsNode(self)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
+    def EvalImpl_(self):
         INodes = self.getInputs()
 
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                self.grNode.setToolTip("WARNING : Bad input shape !")
-                self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
-                return
-
-        if len(INodes) == 0:
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
-            self.shape = None
-            for nn in self.getOutputs():
-                nn.evalImplementation()
-            return
-
         if len(INodes) == 1:
-            self.markDirty(True)
-            self.grNode.setToolTip("WARNING : Usualy needs two or more Inputs. May be an Error!")
+            self.addWarning("Only one input connected")
             self.shape = np.array(INodes[0].shape)
-            for nn in self.getOutputs():
-                nn.evalImplementation()
             return
 
         firstshape = INodes[0].shape
         for node in INodes[1:]:
             print(node)
             if len(node.shape) != len(firstshape) or (node.shape[:-1] != firstshape[:-1]).any():
-                self.markInvalid(True)
-                self.grNode.setToolTip("ERROR : Input shape mismatch!")
+                self.addError("Input shape mismatch")
                 self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
                 return
 
         self.shape = np.array(INodes[0].shape)
         for node in INodes[1:]:
             self.shape[-1] += node.shape[-1]
 
-        for nn in self.getOutputs():
-            nn.evalImplementation()
+
+
+
 
 @register_node(OP_NODE_ADD)
 class CustomNode_Add(CustomNode):
@@ -247,11 +175,8 @@ class CustomNode_Add(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = "keras.layers.Add()"
-        res['type'] = "hidden"
-        return res
+    def updatetfrepr(self):
+        self.tfrepr = "keras.layers.Add()"
 
     def initSettings(self):
         super().initSettings()
@@ -263,52 +188,22 @@ class CustomNode_Add(CustomNode):
     def initInnerClasses(self):
         self.grNode = CustomGraphicsNode(self)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
+    def EvalImpl_(self):
         INodes = self.getInputs()
-        print(INodes)
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                self.grNode.setToolTip("WARNING : Bad input shape !")
-                self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
-                return
-
-        if len(INodes) == 0:
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
-            self.shape = None
-            for nn in self.getOutputs():
-                nn.evalImplementation()
-            return
 
         if len(INodes) == 1:
-            self.markDirty(True)
-            self.grNode.setToolTip("WARNING : Usualy needs two or more Inputs. May be an Error!")
+            self.addWarning("Only one input connected")
             self.shape = np.array(INodes[0].shape)
-            for nn in self.getOutputs():
-                nn.evalImplementation()
             return
 
         firstshape = INodes[0].shape
         for node in INodes[1:]:
             if not ((len(node.shape) == len(firstshape)) and (node.shape == firstshape).all()):
-                self.markInvalid(True)
-                self.grNode.setToolTip("ERROR : Input shape mismatch!")
+                self.addError("Input shape mismatch")
                 self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
                 return
 
         self.shape = np.array(INodes[0].shape)
-        for nn in self.getOutputs():
-            nn.evalImplementation()
 
 
 
@@ -324,11 +219,8 @@ class CustomNode_Prod(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = "keras.layers.Multiply()"
-        res['type'] = "hidden"
-        return res
+    def updatetfrepr(self):
+        self.tfrepr = "keras.layers.Multiply()"
 
     def initSettings(self):
         super().initSettings()
@@ -340,53 +232,25 @@ class CustomNode_Prod(CustomNode):
     def initInnerClasses(self):
         self.grNode = CustomGraphicsNode(self)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
+    def EvalImpl_(self):
         INodes = self.getInputs()
 
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                self.grNode.setToolTip("WARNING : Bad input shape !")
-                self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
-                return
-
-        if len(INodes) == 0:
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
-            self.shape = None
-            for nn in self.getOutputs():
-                nn.evalImplementation()
-            return
-
         if len(INodes) == 1:
-            self.markDirty(True)
-            self.grNode.setToolTip("WARNING : Usualy needs two or more Inputs. May be an Error!")
+            self.addWarning("Only one input connected")
             self.shape = np.array(INodes[0].shape)
-            for nn in self.getOutputs():
-                nn.evalImplementation()
             return
 
         firstshape = INodes[0].shape
         for node in INodes[1:]:
             print(node)
             if len(node.shape) != len(firstshape) or (node.shape != firstshape).any():
-                self.markInvalid(True)
-                self.grNode.setToolTip("ERROR : Input shape mismatch!")
+                self.addError("Input shape mismatch")
                 self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
                 return
 
         self.shape = np.array(INodes[0].shape)
-        for nn in self.getOutputs():
-            nn.evalImplementation()
+
+
 
 
 class CustomInputShapeContent(QDMNodeContentWidget):
@@ -406,14 +270,12 @@ class CustomNode_Input(CustomNode):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[2])
-        self.shape = None
-        self.evalImplementation()
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = "keras.layers.Input(" + self.content.edit.text() + ")"
-        res['type'] = "input"
-        return res
+    def setType(self):
+        self.type = "input"
+
+    def updatetfrepr(self):
+        self.tfrepr = "keras.layers.Input(" + self.content.edit.text() + ")"
 
     def initSettings(self):
         super().initSettings()
@@ -430,22 +292,15 @@ class CustomNode_Input(CustomNode):
         self.grNode = CustomGraphicsNode(self)
         self.content.edit.textChanged.connect(self.onInputChanged)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
+    def EvalImpl_(self):
         try:
             s_value = ast.literal_eval(self.content.edit.text())
             self.shape = np.array(s_value)
         except:
             self.shape = None
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Invalid shape !")
+            self.addError("Invalid shape")
 
-        for nn in self.getOutputs():
-            nn.evalImplementation()
+
 
 
 class CustomConv1DGraphic(CustomGraphicsNode):
@@ -453,7 +308,6 @@ class CustomConv1DGraphic(CustomGraphicsNode):
         super().initSizes()
         self.height = 160
         self.width = 170
-
 
 class CustomConv1DContent(QDMNodeContentWidget):
     def initUI(self):
@@ -531,16 +385,13 @@ class CustomNode_Conv1D(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Conv1D(filters=' + str(self.content.filters.value()) + \
+    def updatetfrepr(self):
+        self.tfrepr = 'keras.layers.Conv1D(filters=' + str(self.content.filters.value()) + \
             ', kernel_size=' + str(self.content.kernelsize.value()) + \
             ', strides=' + str(self.content.strides.value()) + \
             ', padding="' + self.content.padding.currentText() + \
             ', activation="' + self.content.activation.currentText() + '"' + \
             '")'
-        res['type'] = "hidden"
-        return res
 
     def initInnerClasses(self):
         self.content = CustomConv1DContent(self)
@@ -550,37 +401,12 @@ class CustomNode_Conv1D(CustomNode):
         self.content.strides.valueChanged.connect(self.evalImplementation)
         self.content.padding.currentIndexChanged.connect(self.evalImplementation)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
+    def EvalImpl_(self):
         INodes = self.getInputs()
 
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                self.grNode.setToolTip("WARNING : Bad input shape !")
-                self.shape = None
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
-                return
-
-        if len(INodes) == 0:
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Hidden Node with no Inputs!")
-            self.shape = None
-            for nn in self.getOutputs():
-                nn.evalImplementation()
-            return
-
         if len(INodes[0].shape) != 2:
-            self.markInvalid(True)
-            self.grNode.setToolTip("ERROR : Conv1D need input shape of exactly size 2!")
+            self.addError("Conv1D need input shape of exactly size 2")
             self.shape = None
-            for nn in self.getOutputs():
-                nn.evalImplementation()
             return
 
         self.shape = np.array(INodes[0].shape)
@@ -590,8 +416,7 @@ class CustomNode_Conv1D(CustomNode):
         self.shape[0] -= (self.content.kernelsize.value() -1) if self.content.padding.currentText() == "valid" else 0
         self.shape[0] = (self.shape[0] // self.content.strides.value()) + (1 if self.shape[0] % self.content.strides.value() != 0 else 0)
 
-        for nn in self.getOutputs():
-            nn.evalImplementation()
+
 
 
 class CustomConv2DGraphic(CustomGraphicsNode):
@@ -689,16 +514,13 @@ class CustomNode_Conv2D(CustomNode):
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
 
-    def codealize(self):
-        res = super().codealize()
-        res['tfrepr'] = 'keras.layers.Conv2D(filters=' + str(self.content.filters.value()) + \
+    def updatetfrepr(self):
+        self.tfrepr = 'keras.layers.Conv2D(filters=' + str(self.content.filters.value()) + \
             ', kernel_size=(' + str(self.content.kernelsizex.value()) + ', ' + str(self.content.kernelsizey.value()) + ')' + \
             ', strides=(' + str(self.content.stridesx.value()) + ', ' + str(self.content.stridesy.value()) + ')' + \
             ', padding="' + self.content.padding.currentText() + '"' + \
             ', activation="' + self.content.activation.currentText() + '"' + \
             ')'
-        res['type'] = "hidden"
-        return res
 
     def initInnerClasses(self):
         self.content = CustomConv2DContent(self)
@@ -710,81 +532,24 @@ class CustomNode_Conv2D(CustomNode):
         self.content.stridesy.valueChanged.connect(self.evalImplementation)
         self.content.padding.currentIndexChanged.connect(self.evalImplementation)
 
-    def evalImplementation(self):
-
-        self.markInvalid(False)
-        self.markDirty(False)
-        self.grNode.setToolTip("")
-
-        self.content.label2.setStyleSheet("color : white;")
-        self.content.label2.setToolTip("")
-        self.content.label3.setStyleSheet("color : white;")
-
-        self.content.kernelsizex.setStyleSheet("background-color: white;")
-        self.content.kernelsizex.setToolTip("")
-        self.content.kernelsizey.setStyleSheet("background-color: white;")
-        self.content.kernelsizey.setToolTip("")
-
-        grNodeToolTip = ""
-
+    def EvalImpl_(self):
         if self.content.kernelsizex.value() % 2 == 0:
-            self.content.kernelsizex.setStyleSheet("background-color: yellow;")
-            self.content.kernelsizex.setToolTip("WARNING : kernel size should be odd, this is usualy an error")
-            grNodeToolTip += "WARNING : even Kernel size at pos 1\n"
+            self.addWarning("Even kernel size at pos 1", self.content.kernelsizex, "background-color: yellow;")
 
         if self.content.kernelsizey.value() % 2 == 0:
-            self.content.kernelsizey.setStyleSheet("background-color: yellow;")
-            self.content.kernelsizey.setToolTip("WARNING : kernel size should be odd, this is usualy an error")
-            grNodeToolTip += "WARNING : even Kernel size at pos 2\n"
+            self.addWarning("Even kernel size at pos 2", self.content.kernelsizey, "background-color: yellow;")
 
         if self.content.kernelsizex.value() != self.content.kernelsizey.value():
-            self.content.label2.setStyleSheet("color : red;")
-            self.content.label2.setToolTip("WARNING : kernel size of different values, this is usualy an error")
-            grNodeToolTip += "WARNING : Kernel size of different values\n"
+            self.addWarning("Kernel size of different values", self.content.label2, "color: red;")
 
         if self.content.stridesx.value() != self.content.stridesy.value():
-            self.content.label3.setStyleSheet("color : red;")
-            self.content.label3.setToolTip("WARNING : strides of different values, this is usualy an error")
-            grNodeToolTip += "WARNING : strides of different values\n"
+            self.addWarning("Strides of different values", self.content.label3, "color: red;")
 
         INodes = self.getInputs()
 
-        for node in INodes:
-            if node.shape is None:
-                self.markDirty(True)
-                grNodeToolTip += "WARNING : Bad input shape !"
-                self.grNode.setToolTip(grNodeToolTip)
-                self.shape = None
-                self.outputs[0].grSocket.setToolTip(str(self.shape))
-                for nn in self.getOutputs():
-                    nn.evalImplementation()
-                return
-
-        if len(INodes) == 0:
-            self.markInvalid(True)
-            grNodeToolTip += "ERROR : Hidden Node with no Inputs!"
-            self.grNode.setToolTip(grNodeToolTip)
-            self.shape = None
-            self.outputs[0].grSocket.setToolTip(str(self.shape))
-            for nn in self.getOutputs():
-                nn.evalImplementation()
-            return
-
-        for node in INodes:
-            for val in node.shape:
-                if val == None:
-                    grNodeToolTip += "INFO : Input shape contains None size\n"
-                    self.inputs[0].grSocket.setToolTip("INFO : Input shape contains None size\n")
-                    break
-
         if len(INodes[0].shape) != 3:
-            self.markInvalid(True)
-            grNodeToolTip += "ERROR : Conv2D need input shape of exactly size 3!"
-            self.grNode.setToolTip(grNodeToolTip)
+            self.addError("Conv2D need input shape of exactly size 3")
             self.shape = None
-            self.outputs[0].grSocket.setToolTip(str(self.shape))
-            for nn in self.getOutputs():
-                nn.evalImplementation()
             return
 
         self.shape = np.array(INodes[0].shape)
@@ -803,38 +568,44 @@ class CustomNode_Conv2D(CustomNode):
         else:
             self.shape[1] = None
 
-        self.grNode.setToolTip(grNodeToolTip)
+    def resetAll(self):
+        super().resetAll()
+        self.content.label2.setStyleSheet("color : white;")
+        self.content.label2.setToolTip("")
+        self.content.label3.setStyleSheet("color : white;")
 
-        self.outputs[0].grSocket.setToolTip(str(self.shape))
+        self.content.kernelsizex.setStyleSheet("background-color: white;")
+        self.content.kernelsizex.setToolTip("")
+        self.content.kernelsizey.setStyleSheet("background-color: white;")
+        self.content.kernelsizey.setToolTip("")
 
-        for nn in self.getOutputs():
-            nn.evalImplementation()
+
 
 
 
 class CustomActivationContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
-        self.comboBox = QComboBox(self)
+        self.activation = QComboBox(self)
         # self.comboBox.addItem("None")
         #self.comboBox.addItem("elu")
-        self.comboBox.addItem("linear")
-        self.comboBox.addItem("softmax")
+        self.activation.addItem("linear")
+        self.activation.addItem("softmax")
         #self.comboBox.addItem("selu")
-        self.comboBox.addItem("softplus")
-        self.comboBox.addItem("softsign")
-        self.comboBox.addItem("relu")
-        self.comboBox.addItem("tanh")
-        self.comboBox.addItem("sigmoid")
-        self.comboBox.addItem("hard_sigmoid")
-        self.comboBox.addItem("exponential")
+        self.activation.addItem("softplus")
+        self.activation.addItem("softsign")
+        self.activation.addItem("relu")
+        self.activation.addItem("tanh")
+        self.activation.addItem("sigmoid")
+        self.activation.addItem("hard_sigmoid")
+        self.activation.addItem("exponential")
         #self.comboBox.addItem("LeakyReLu")
         #self.comboBox.addItem("PReLu")
         #self.comboBox.addItem("ThresholdedReLU")
         #self.comboBox.setObjectName(self.node.content_label_objname)
         #self.comboBox.activated[str].connect(self.style_choice)
         self.setLayout(self.layout)
-        self.layout.addWidget(self.comboBox, Qt.AlignLeft)
+        self.layout.addWidget(self.activation, Qt.AlignLeft)
         # self.initHeight=self.node.grNode.height
 
     # def style_choice(self, type_choosen):
@@ -869,6 +640,9 @@ class CustomNode_Activation(CustomNode):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
+
+    def updatetfrepr(self):
+        self.tfrepr = 'keras.layers.Activation("' + self.content.activation.currentText() + '")'
 
     def initInnerClasses(self):
         self.content = CustomActivationContent(self)
