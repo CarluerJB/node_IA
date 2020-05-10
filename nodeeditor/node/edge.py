@@ -48,6 +48,7 @@ class Edge(Serializable):
         # default init
         self._start_socket = None
         self._end_socket = None
+        self.grEdge = None
 
         self.start_socket = start_socket
         self.end_socket = end_socket
