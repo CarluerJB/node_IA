@@ -18,11 +18,10 @@ class Node(object):
         return self.depth
 
     def __repr__(self):
-        return '<{0} - {1} - {2}>'.format(
-            self.depth,
-            self.reprname + " = " + self.tfrepr,
-            self.children
+        return "<{0} - {1} - {2}>".format(
+            self.depth, self.reprname + " = " + self.tfrepr, self.children
         )
+
 
 def generateNodeTree(info) -> list:
     """
@@ -51,24 +50,22 @@ def generateNodeTree(info) -> list:
 
     return result
 
+
 def generateStr(nodeTree: list) -> str:
-    result  = "import tensorflow as tf" + "\n"
+    result = "import tensorflow as tf" + "\n"
     result += "import tensorflow.keras as keras" + "\n\n"
 
     result += "def Model():" + "\n"
 
     for node in nodeTree:
-        result += '\t{0} = {1}'.format(
-            node.reprname,
-            node.tfrepr
-        )
+        result += "\t{0} = {1}".format(node.reprname, node.tfrepr)
         if len(node.children) == 1:
-            result += '({0})'.format(node.children[0].reprname)
+            result += "({0})".format(node.children[0].reprname)
         elif len(node.children) > 1:
-            result += '([{0}'.format(node.children[0].reprname)
+            result += "([{0}".format(node.children[0].reprname)
             for nn in node.children[1:]:
-                result += ', {0}'.format(nn.reprname)
-            result += '])'
+                result += ", {0}".format(nn.reprname)
+            result += "])"
         result += "\n"
 
     inputs = [x for x in nodeTree if x.type == "input"]
@@ -77,26 +74,26 @@ def generateStr(nodeTree: list) -> str:
     print(inputs)
     print(outputs)
 
-    result += '\treturn keras.models.Model(inputs = '
+    result += "\treturn keras.models.Model(inputs = "
     if len(inputs) == 1:
         result += inputs[0].reprname
     elif len(inputs) > 1:
-        result += '[{0}'.format(inputs[0].reprname)
+        result += "[{0}".format(inputs[0].reprname)
         for nn in inputs[1:]:
-            result += ', {0}'.format(nn.reprname)
-        result += ']'
-    result += ', outputs = '
+            result += ", {0}".format(nn.reprname)
+        result += "]"
+    result += ", outputs = "
     if len(outputs) == 1:
         result += outputs[0].reprname
     elif len(outputs) > 1:
-        result += '[{0}'.format(outputs[0].reprname)
+        result += "[{0}".format(outputs[0].reprname)
         for nn in outputs[1:]:
-            result += ', {0}'.format(nn.reprname)
-        result += ']'
-    result += ')' + "\n\n"
+            result += ", {0}".format(nn.reprname)
+        result += "]"
+    result += ")" + "\n\n"
 
     result += 'if __name__=="__main__":' + "\n"
-    result += '\tmodel = Model()' + "\n"
-    result += '\tmodel.summary()' + "\n"
+    result += "\tmodel = Model()" + "\n"
+    result += "\tmodel.summary()" + "\n"
 
     return result

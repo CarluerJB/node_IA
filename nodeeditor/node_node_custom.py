@@ -33,10 +33,7 @@ class CustomGraphicsNode(QDMGraphicsNode):
             offset = 48.0
 
         painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0),
-            self.icons,
-            QRectF(offset, 0, 24.0, 24.0)
-
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
         )
 
 
@@ -52,6 +49,7 @@ class CustomNode(Node):
     op_title = "Undefined"
     content_label = ""
     content_label_objname = "calc_node_bg"
+
     def __init__(self, scene, inputs=[2, 2], outputs=[2, 2]):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
         self.value = None
@@ -82,7 +80,6 @@ class CustomNode(Node):
             if stylesheet is not None:
                 which.setStyleSheet(stylesheet)
 
-
     def addError(self, message: str, which=None, stylesheet=None):
         self.markInvalid(True)
         self.grNodeToolTip += "ERROR : " + message + "\n"
@@ -103,20 +100,19 @@ class CustomNode(Node):
         res = super().codealize()
         # update representation
         self.updatetfrepr()
-        res['op_code'] = self.__class__.op_code
-        res['tfrepr'] = self.tfrepr
-        res['type'] = self.type
+        res["op_code"] = self.__class__.op_code
+        res["tfrepr"] = self.tfrepr
+        res["type"] = self.type
         return res
 
     def serialize(self):
         res = super().serialize()
-        res['op_code'] = self.__class__.op_code
+        res["op_code"] = self.__class__.op_code
         return res
 
     def deserialize(self, data, hashmap={}, restore_id=True):
         res = super().deserialize(data, hashmap, restore_id)
-        print("Deserialized CalcNode '%s'" %
-              self.__class__.__name__, "res:", res)
+        print("Deserialized CalcNode '%s'" % self.__class__.__name__, "res:", res)
         return res
 
     def evalOperation(self, array):
@@ -171,11 +167,11 @@ class CustomNode(Node):
 
         self.endEval()
 
-
     def eval(self):
         if not self.isDirty() and not self.isInvalid():
-            print(" _> returning cached %s value:" %
-                  self.__class__.__name__, self.value)
+            print(
+                " _> returning cached %s value:" % self.__class__.__name__, self.value
+            )
             return self.value
         try:
             val = self.evalImplementation()

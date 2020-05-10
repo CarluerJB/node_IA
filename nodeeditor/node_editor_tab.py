@@ -10,10 +10,11 @@ from nodeeditor.node_drag_list import NodeDragList
 
 class NodeEditorTabs(QWidget):
     NodeEditorWidget_class = NodeEditorWidget
+
     def __init__(self, parent):
         super().__init__(parent)
         self.initUi()
-    
+
     def initUi(self):
         self.nodeEditor = self.__class__.NodeEditorWidget_class(self)
         self.node_drag_list = NodeDragList(self)

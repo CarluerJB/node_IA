@@ -5,7 +5,6 @@ from PyQt5.QtCore import *
 from nodeeditor.node_editor_tab import NodeEditorTabs
 
 
-
 class ProjectTabs(QWidget):
     def __init__(self, parent):
         super().__init__(parent)

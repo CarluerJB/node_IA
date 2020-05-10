@@ -4,7 +4,14 @@ from nodeeditor.node_content_conf import *
 from nodeeditor.node_node_custom import *
 from nodeeditor.utils import dumpException
 from nodeeditor.Node_type_conf import *
-from nodeeditor.node_socket import LEFT_BOTTOM, LEFT_CENTER, LEFT_TOP, RIGHT_BOTTOM, RIGHT_CENTER, RIGHT_TOP
+from nodeeditor.node_socket import (
+    LEFT_BOTTOM,
+    LEFT_CENTER,
+    LEFT_TOP,
+    RIGHT_BOTTOM,
+    RIGHT_CENTER,
+    RIGHT_TOP,
+)
 import numpy as np
 import ast
 
@@ -25,13 +32,13 @@ class CustomNode_Output(CustomNode):
         self.type = "output"
 
     def updatetfrepr(self):
-        self.tfrepr = 'keras.layers.Activation("' + self.content.activation.currentText() + '")'
+        self.tfrepr = (
+            'keras.layers.Activation("' + self.content.activation.currentText() + '")'
+        )
 
     def initInnerClasses(self):
         self.content = CustomActivationContent(self)
         self.grNode = CustomGraphicsNode(self)
-
-
 
 
 class CustomDenseGraphic(CustomGraphicsNode):
@@ -39,6 +46,7 @@ class CustomDenseGraphic(CustomGraphicsNode):
         super().initSizes()
         self.height = 105
         self.width = 170
+
 
 class CustomDenseContent(QDMNodeContentWidget):
     def initUI(self):
@@ -82,6 +90,7 @@ class CustomDenseContent(QDMNodeContentWidget):
 
         self.VL.addLayout(self.HL5)
 
+
 @register_node(OP_NODE_DENSE)
 class CustomNode_Dense(CustomNode):
     icon = ""
@@ -94,10 +103,16 @@ class CustomNode_Dense(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[1])
 
     def updatetfrepr(self):
-        self.tfrepr = 'keras.layers.Dense(units=' + str(self.content.units.value()) + \
-            ', use_bias=' + ('True' if self.content.usebias.isChecked() else 'False') + \
-            ', activation="' + self.content.activation.currentText() + '"' + \
-            ')'
+        self.tfrepr = (
+            "keras.layers.Dense(units="
+            + str(self.content.units.value())
+            + ", use_bias="
+            + ("True" if self.content.usebias.isChecked() else "False")
+            + ', activation="'
+            + self.content.activation.currentText()
+            + '"'
+            + ")"
+        )
 
     def initInnerClasses(self):
         self.content = CustomDenseContent(self)
@@ -110,13 +125,12 @@ class CustomNode_Dense(CustomNode):
         self.shape[-1] = self.content.units.value()
 
 
-
-
 class CustomConcatContent(QDMNodeContentWidget):
     def initUI(self):
-        self.edit = QLineEdit('1', self)
+        self.edit = QLineEdit("1", self)
         self.edit.setAlignment(Qt.AlignLeft)
         self.edit.setObjectName(self.node.content_label_objname)
+
 
 @register_node(OP_NODE_CONCAT)
 class CustomNode_Concat(CustomNode):
@@ -130,14 +144,14 @@ class CustomNode_Concat(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[1])
 
     def updatetfrepr(self):
-        self.tfrepr = 'keras.layers.Concatenate()'
+        self.tfrepr = "keras.layers.Concatenate()"
 
     def initSettings(self):
         super().initSettings()
         self.input_multi_edged = True
 
     def initInnerClasses(self):
-        #self.content = CustomDenseContent(self)
+        # self.content = CustomDenseContent(self)
         self.grNode = CustomGraphicsNode(self)
 
     def EvalImpl_(self):
@@ -151,7 +165,10 @@ class CustomNode_Concat(CustomNode):
         firstshape = INodes[0].shape
         for node in INodes[1:]:
             print(node)
-            if len(node.shape) != len(firstshape) or (node.shape[:-1] != firstshape[:-1]).any():
+            if (
+                len(node.shape) != len(firstshape)
+                or (node.shape[:-1] != firstshape[:-1]).any()
+            ):
                 self.addError("Input shape mismatch")
                 self.shape = None
                 return
@@ -159,9 +176,6 @@ class CustomNode_Concat(CustomNode):
         self.shape = np.array(INodes[0].shape)
         for node in INodes[1:]:
             self.shape[-1] += node.shape[-1]
-
-
-
 
 
 @register_node(OP_NODE_ADD)
@@ -198,14 +212,15 @@ class CustomNode_Add(CustomNode):
 
         firstshape = INodes[0].shape
         for node in INodes[1:]:
-            if not ((len(node.shape) == len(firstshape)) and (node.shape == firstshape).all()):
+            if not (
+                (len(node.shape) == len(firstshape))
+                and (node.shape == firstshape).all()
+            ):
                 self.addError("Input shape mismatch")
                 self.shape = None
                 return
 
         self.shape = np.array(INodes[0].shape)
-
-
 
 
 @register_node(OP_NODE_PROD)
@@ -251,11 +266,9 @@ class CustomNode_Prod(CustomNode):
         self.shape = np.array(INodes[0].shape)
 
 
-
-
 class CustomInputShapeContent(QDMNodeContentWidget):
     def initUI(self):
-        self.edit = QLineEdit('(0, 0)', self)
+        self.edit = QLineEdit("(0, 0)", self)
         self.edit.setAlignment(Qt.AlignRight)
         self.edit.setObjectName(self.node.content_label_objname)
 
@@ -301,13 +314,12 @@ class CustomNode_Input(CustomNode):
             self.addError("Invalid shape")
 
 
-
-
 class CustomConv1DGraphic(CustomGraphicsNode):
     def initSizes(self):
         super().initSizes()
         self.height = 160
         self.width = 170
+
 
 class CustomConv1DContent(QDMNodeContentWidget):
     def initUI(self):
@@ -375,6 +387,7 @@ class CustomConv1DContent(QDMNodeContentWidget):
 
         self.VL.addLayout(self.HL5)
 
+
 @register_node(OP_NODE_CONV1D)
 class CustomNode_Conv1D(CustomNode):
     icon = ""
@@ -386,12 +399,20 @@ class CustomNode_Conv1D(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[1])
 
     def updatetfrepr(self):
-        self.tfrepr = 'keras.layers.Conv1D(filters=' + str(self.content.filters.value()) + \
-            ', kernel_size=' + str(self.content.kernelsize.value()) + \
-            ', strides=' + str(self.content.strides.value()) + \
-            ', padding="' + self.content.padding.currentText() + \
-            ', activation="' + self.content.activation.currentText() + '"' + \
-            '")'
+        self.tfrepr = (
+            "keras.layers.Conv1D(filters="
+            + str(self.content.filters.value())
+            + ", kernel_size="
+            + str(self.content.kernelsize.value())
+            + ", strides="
+            + str(self.content.strides.value())
+            + ', padding="'
+            + self.content.padding.currentText()
+            + ', activation="'
+            + self.content.activation.currentText()
+            + '"'
+            + '")'
+        )
 
     def initInnerClasses(self):
         self.content = CustomConv1DContent(self)
@@ -413,10 +434,14 @@ class CustomNode_Conv1D(CustomNode):
 
         self.shape[1] = self.content.filters.value()
 
-        self.shape[0] -= (self.content.kernelsize.value() -1) if self.content.padding.currentText() == "valid" else 0
-        self.shape[0] = (self.shape[0] // self.content.strides.value()) + (1 if self.shape[0] % self.content.strides.value() != 0 else 0)
-
-
+        self.shape[0] -= (
+            (self.content.kernelsize.value() - 1)
+            if self.content.padding.currentText() == "valid"
+            else 0
+        )
+        self.shape[0] = (self.shape[0] // self.content.strides.value()) + (
+            1 if self.shape[0] % self.content.strides.value() != 0 else 0
+        )
 
 
 class CustomConv2DGraphic(CustomGraphicsNode):
@@ -504,6 +529,7 @@ class CustomConv2DContent(QDMNodeContentWidget):
 
         self.VL.addLayout(self.HL5)
 
+
 @register_node(OP_NODE_CONV2D)
 class CustomNode_Conv2D(CustomNode):
     icon = ""
@@ -515,12 +541,27 @@ class CustomNode_Conv2D(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[1])
 
     def updatetfrepr(self):
-        self.tfrepr = 'keras.layers.Conv2D(filters=' + str(self.content.filters.value()) + \
-            ', kernel_size=(' + str(self.content.kernelsizex.value()) + ', ' + str(self.content.kernelsizey.value()) + ')' + \
-            ', strides=(' + str(self.content.stridesx.value()) + ', ' + str(self.content.stridesy.value()) + ')' + \
-            ', padding="' + self.content.padding.currentText() + '"' + \
-            ', activation="' + self.content.activation.currentText() + '"' + \
-            ')'
+        self.tfrepr = (
+            "keras.layers.Conv2D(filters="
+            + str(self.content.filters.value())
+            + ", kernel_size=("
+            + str(self.content.kernelsizex.value())
+            + ", "
+            + str(self.content.kernelsizey.value())
+            + ")"
+            + ", strides=("
+            + str(self.content.stridesx.value())
+            + ", "
+            + str(self.content.stridesy.value())
+            + ")"
+            + ', padding="'
+            + self.content.padding.currentText()
+            + '"'
+            + ', activation="'
+            + self.content.activation.currentText()
+            + '"'
+            + ")"
+        )
 
     def initInnerClasses(self):
         self.content = CustomConv2DContent(self)
@@ -534,16 +575,28 @@ class CustomNode_Conv2D(CustomNode):
 
     def EvalImpl_(self):
         if self.content.kernelsizex.value() % 2 == 0:
-            self.addWarning("Even kernel size at pos 1", self.content.kernelsizex, "background-color: yellow;")
+            self.addWarning(
+                "Even kernel size at pos 1",
+                self.content.kernelsizex,
+                "background-color: yellow;",
+            )
 
         if self.content.kernelsizey.value() % 2 == 0:
-            self.addWarning("Even kernel size at pos 2", self.content.kernelsizey, "background-color: yellow;")
+            self.addWarning(
+                "Even kernel size at pos 2",
+                self.content.kernelsizey,
+                "background-color: yellow;",
+            )
 
         if self.content.kernelsizex.value() != self.content.kernelsizey.value():
-            self.addWarning("Kernel size of different values", self.content.label2, "color: red;")
+            self.addWarning(
+                "Kernel size of different values", self.content.label2, "color: red;"
+            )
 
         if self.content.stridesx.value() != self.content.stridesy.value():
-            self.addWarning("Strides of different values", self.content.label3, "color: red;")
+            self.addWarning(
+                "Strides of different values", self.content.label3, "color: red;"
+            )
 
         INodes = self.getInputs()
 
@@ -557,14 +610,26 @@ class CustomNode_Conv2D(CustomNode):
         self.shape[2] = self.content.filters.value()
 
         if self.shape[0] != None:
-            self.shape[0] -= (self.content.kernelsizex.value() -1) if self.content.padding.currentText() == "valid" else 0
-            self.shape[0] = (self.shape[0] // self.content.stridesx.value()) + (1 if self.shape[0] % self.content.stridesx.value() != 0 else 0)
+            self.shape[0] -= (
+                (self.content.kernelsizex.value() - 1)
+                if self.content.padding.currentText() == "valid"
+                else 0
+            )
+            self.shape[0] = (self.shape[0] // self.content.stridesx.value()) + (
+                1 if self.shape[0] % self.content.stridesx.value() != 0 else 0
+            )
         else:
             self.shape[0] = None
 
         if self.shape[1] != None:
-            self.shape[1] -= (self.content.kernelsizey.value() -1) if self.content.padding.currentText() == "valid" else 0
-            self.shape[1] = (self.shape[1] // self.content.stridesy.value()) + (1 if self.shape[1] % self.content.stridesy.value() != 0 else 0)
+            self.shape[1] -= (
+                (self.content.kernelsizey.value() - 1)
+                if self.content.padding.currentText() == "valid"
+                else 0
+            )
+            self.shape[1] = (self.shape[1] // self.content.stridesy.value()) + (
+                1 if self.shape[1] % self.content.stridesy.value() != 0 else 0
+            )
         else:
             self.shape[1] = None
 
@@ -580,18 +645,15 @@ class CustomNode_Conv2D(CustomNode):
         self.content.kernelsizey.setToolTip("")
 
 
-
-
-
 class CustomActivationContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
         self.activation = QComboBox(self)
         # self.comboBox.addItem("None")
-        #self.comboBox.addItem("elu")
+        # self.comboBox.addItem("elu")
         self.activation.addItem("linear")
         self.activation.addItem("softmax")
-        #self.comboBox.addItem("selu")
+        # self.comboBox.addItem("selu")
         self.activation.addItem("softplus")
         self.activation.addItem("softsign")
         self.activation.addItem("relu")
@@ -599,11 +661,11 @@ class CustomActivationContent(QDMNodeContentWidget):
         self.activation.addItem("sigmoid")
         self.activation.addItem("hard_sigmoid")
         self.activation.addItem("exponential")
-        #self.comboBox.addItem("LeakyReLu")
-        #self.comboBox.addItem("PReLu")
-        #self.comboBox.addItem("ThresholdedReLU")
-        #self.comboBox.setObjectName(self.node.content_label_objname)
-        #self.comboBox.activated[str].connect(self.style_choice)
+        # self.comboBox.addItem("LeakyReLu")
+        # self.comboBox.addItem("PReLu")
+        # self.comboBox.addItem("ThresholdedReLU")
+        # self.comboBox.setObjectName(self.node.content_label_objname)
+        # self.comboBox.activated[str].connect(self.style_choice)
         self.setLayout(self.layout)
         self.layout.addWidget(self.activation, Qt.AlignLeft)
         # self.initHeight=self.node.grNode.height
@@ -642,7 +704,9 @@ class CustomNode_Activation(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[1])
 
     def updatetfrepr(self):
-        self.tfrepr = 'keras.layers.Activation("' + self.content.activation.currentText() + '")'
+        self.tfrepr = (
+            'keras.layers.Activation("' + self.content.activation.currentText() + '")'
+        )
 
     def initInnerClasses(self):
         self.content = CustomActivationContent(self)

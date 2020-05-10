@@ -14,11 +14,13 @@ from nodeeditor.node_graphics_view import QDMGraphicsView
 
 from nodeeditor.IA_input_node import CustomNode_Input, CustomNode_Output, CustomNode_Add
 
+
 class NodeEditorWidget(QWidget):
     Scene_class = Scene
 
     """The ``NodeEditorWidget`` class"""
-    def __init__(self, parent:QWidget=None):
+
+    def __init__(self, parent: QWidget = None):
         """
         :param parent: parent widget
         :type parent: ``QWidget``
@@ -34,7 +36,6 @@ class NodeEditorWidget(QWidget):
 
         self.initUI()
 
-
     def initUI(self):
         """Set up this ``NodeEditorWidget`` with its layout,  :class:`~nodeeditor.node_scene.Scene` and
         :class:`~nodeeditor.node_graphics_view.QDMGraphicsView`"""
@@ -48,7 +49,6 @@ class NodeEditorWidget(QWidget):
         # create graphics view
         self.view = QDMGraphicsView(self.scene.grScene, self)
         self.layout.addWidget(self.view)
-
 
     def isModified(self) -> bool:
         """Has the `Scene` been modified?
@@ -122,7 +122,7 @@ class NodeEditorWidget(QWidget):
         self.scene.history.clear()
         self.scene.history.storeInitialHistoryStamp()
 
-    def fileLoad(self, filename:str):
+    def fileLoad(self, filename: str):
         """Load serialized graph from JSON file
 
         :param filename: file to load
@@ -138,36 +138,38 @@ class NodeEditorWidget(QWidget):
         except InvalidFile as e:
             print(e)
             QApplication.restoreOverrideCursor()
-            QMessageBox.warning(self, "Error loading %s" % os.path.basename(filename), str(e))
+            QMessageBox.warning(
+                self, "Error loading %s" % os.path.basename(filename), str(e)
+            )
             return False
         finally:
             QApplication.restoreOverrideCursor()
 
-
-    def fileSave(self, filename:str=None):
+    def fileSave(self, filename: str = None):
         """Save serialized graph to JSON file. When called with empty parameter, we won't store/remember the filename
 
         :param filename: file to store the graph
         :type filename: ``str``
         """
-        if filename is not None: self.filename = filename
+        if filename is not None:
+            self.filename = filename
         QApplication.setOverrideCursor(Qt.WaitCursor)
         self.scene.saveToFile(self.filename)
         QApplication.restoreOverrideCursor()
         return True
 
-    def fileSaveToCode(self, codefilename:str=None):
+    def fileSaveToCode(self, codefilename: str = None):
         """Save graph to Code file. When called with empty parameter, we won't store/remember the codefilename
 
         :param codefilename: code file to store the graph
         :type codefilename: ``str``
         """
-        if codefilename is not None: self.codefilename = codefilename
+        if codefilename is not None:
+            self.codefilename = codefilename
         QApplication.setOverrideCursor(Qt.WaitCursor)
         self.scene.saveToCodeFile(self.codefilename)
         QApplication.restoreOverrideCursor()
         return True
-
 
     def addNodes(self):
         """Testing method to create 3 `Nodes` with 3 `Edges` connecting them"""
@@ -226,18 +228,15 @@ class NodeEditorWidget(QWidget):
         text.setFlag(QGraphicsItem.ItemIsMovable)
         text.setDefaultTextColor(QColor.fromRgbF(1.0, 1.0, 1.0))
 
-
         widget1 = QPushButton("Hello World")
         proxy1 = self.grScene.addWidget(widget1)
         proxy1.setFlag(QGraphicsItem.ItemIsMovable)
         proxy1.setPos(0, 30)
 
-
         widget2 = QTextEdit()
         proxy2 = self.grScene.addWidget(widget2)
         proxy2.setFlag(QGraphicsItem.ItemIsSelectable)
         proxy2.setPos(0, 60)
-
 
         line = self.grScene.addLine(-200, -200, 400, -100, outlinePen)
         line.setFlag(QGraphicsItem.ItemIsMovable)
