@@ -21,10 +21,10 @@ class Serializable:
         :return: data serialized in ``OrderedDict``
         :rtype: ``OrderedDict``
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def deserialize(
-        self, data: dict, hashmap: dict = {}, restore_id: bool = True
+        self, data: dict, hashmap: dict = None, restore_id: bool = True
     ) -> bool:
         """
         Deserialization method which take data in python ``dict`` format with helping `hashmap` containing
@@ -40,4 +40,6 @@ class Serializable:
         :return: ``True`` if deserialization was successfull, otherwise ``False``
         :rtype: ``bool``
         """
-        raise NotImplemented()
+        if hashmap is None:
+            hashmap = {}
+        raise NotImplementedError()
