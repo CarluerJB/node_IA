@@ -7,13 +7,13 @@ import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from nodeeditor.node_editor_widget import NodeEditorWidget
-from nodeeditor.node_content_conf import *
+from nodeeditor.node.editor_widget import NodeEditorWidget
+from nodeeditor.node.content_conf import *
 from nodeeditor.project_tab import ProjectTabs
-from nodeeditor.node_node_custom import CustomNode, CustomContent
+from nodeeditor.node.node_custom import CustomNode, CustomContent
 from nodeeditor.utils import dumpException
 from nodeeditor.IA_input_node import *
-from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER
+from nodeeditor.node.edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER
 
 
 class NodeEditorWindow(QMainWindow):
@@ -36,7 +36,7 @@ class NodeEditorWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        """Set up this ``QMainWindow``. Create :class:`~nodeeditor.node_editor_widget.NodeEditorWidget`, Actions and Menus"""
+        """Set up this ``QMainWindow``. Create :class:`~nodeeditor.node.editor_widget.NodeEditorWidget`, Actions and Menus"""
         self.createActions()
         self.createMenus()
 
@@ -288,18 +288,18 @@ class NodeEditorWindow(QMainWindow):
             event.ignore()
 
     def isModified(self) -> bool:
-        """Has current :class:`~nodeeditor.node_scene.Scene` been modified?
+        """Has current :class:`~nodeeditor.node.scene.Scene` been modified?
 
-        :return: ``True`` if current :class:`~nodeeditor.node_scene.Scene` has been modified
+        :return: ``True`` if current :class:`~nodeeditor.node.scene.Scene` has been modified
         :rtype: ``bool``
         """
         return self.getCurrentNodeEditorWidget().scene.isModified()
 
     def getCurrentNodeEditorWidget(self) -> NodeEditorWidget:
-        """get current :class:`~nodeeditor.node_editor_widget`
+        """get current :class:`~nodeeditor.node.editor_widget`
 
-        :return: get current :class:`~nodeeditor.node_editor_widget`
-        :rtype: :class:`~nodeeditor.node_editor_widget`
+        :return: get current :class:`~nodeeditor.node.editor_widget`
+        :rtype: :class:`~nodeeditor.node.editor_widget`
         """
         return self.centralWidget().model_tab.nodeEditor
 

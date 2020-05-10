@@ -1,10 +1,10 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from nodeeditor.node_content_conf import *
-from nodeeditor.node_node_custom import *
+from nodeeditor.node.content_conf import *
+from nodeeditor.node.node_custom import *
 from nodeeditor.utils import dumpException
 from nodeeditor.Node_type_conf import *
-from nodeeditor.node_socket import (
+from nodeeditor.node.socket import (
     LEFT_BOTTOM,
     LEFT_CENTER,
     LEFT_TOP,

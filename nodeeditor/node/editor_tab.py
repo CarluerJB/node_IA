@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-from nodeeditor.node_editor_widget import NodeEditorWidget
-from nodeeditor.node_drag_list import NodeDragList
+from nodeeditor.node.editor_widget import NodeEditorWidget
+from nodeeditor.node.drag_list import NodeDragList
 
 
 class NodeEditorTabs(QWidget):

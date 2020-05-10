@@ -2,23 +2,23 @@
 """A module containing base class for Node's content graphical representation. It also contains example of
 overriden Text Widget which can pass to it's parent notification about currently being modified."""
 from collections import OrderedDict
-from nodeeditor.node_serializable import Serializable
+from nodeeditor.node.serializable import Serializable
 from PyQt5.QtWidgets import *
 
 
 class QDMNodeContentWidget(QWidget, Serializable):
     """Base class for representation of the Node's graphics content. This class also provides layout
-    for other widgets inside of a :py:class:`~nodeeditor.node_node.Node`"""
+    for other widgets inside of a :py:class:`~nodeeditor.node.node.Node`"""
 
     def __init__(self, node: "Node", parent: QWidget = None, content: int = 0):
         """
-        :param node: reference to the :py:class:`~nodeeditor.node_node.Node`
-        :type node: :py:class:`~nodeeditor.node_node.Node`
+        :param node: reference to the :py:class:`~nodeeditor.node.node.Node`
+        :type node: :py:class:`~nodeeditor.node.node.Node`
         :param parent: parent widget
         :type parent: QWidget
 
         :Instance Attributes:
-            - **node** - reference to the :class:`~nodeeditor.node_node.Node`
+            - **node** - reference to the :class:`~nodeeditor.node.node.Node`
             - **layout** - ``QLayout`` container
         """
         self.content = content
@@ -28,7 +28,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.initUI()
 
     def initUI(self):
-        """Sets up layouts and widgets to be rendered in :py:class:`~nodeeditor.node_graphics_node.QDMGraphicsNode` class.
+        """Sets up layouts and widgets to be rendered in :py:class:`~nodeeditor.node.graphics_node.QDMGraphicsNode` class.
         """
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -42,7 +42,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
             If you are handling keyPress events by default Qt Window's shortcuts and ``QActions``, you will not
             probably need to use this method
 
-        Helper function which sets editingFlag inside :py:class:`~nodeeditor.node_graphics_view.QDMGraphicsView` class.
+        Helper function which sets editingFlag inside :py:class:`~nodeeditor.node.graphics_view.QDMGraphicsView` class.
 
         This is a helper function to handle keys inside nodes with ``QLineEdits`` or ``QTextEdits`` (you can
         use overriden :py:class:`QDMTextEdit` class) and with QGraphicsView class method ``keyPressEvent``.

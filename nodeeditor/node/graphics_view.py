@@ -5,13 +5,13 @@ A module containing `Graphics View` for NodeEditor
 from PyQt5.QtWidgets import QGraphicsView, QApplication
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from nodeeditor.node_graphics_node import QDMGraphicsNode
-from nodeeditor.node_graphics_socket import QDMGraphicsSocket
-from nodeeditor.node_graphics_edge import QDMGraphicsEdge
-from nodeeditor.node_edge import Edge, EDGE_TYPE_BEZIER
-from nodeeditor.node_graphics_cutline import QDMCutLine
+from nodeeditor.node.graphics_node import QDMGraphicsNode
+from nodeeditor.node.graphics_socket import QDMGraphicsSocket
+from nodeeditor.node.graphics_edge import QDMGraphicsEdge
+from nodeeditor.node.edge import Edge, EDGE_TYPE_BEZIER
+from nodeeditor.node.graphics_cutline import QDMCutLine
 from nodeeditor.utils import dumpException
-from nodeeditor.node_socket_custom import CustomGraphicsSocket
+from nodeeditor.node.socket_custom import CustomGraphicsSocket
 
 
 MODE_NOOP = 1  #: Mode representing ready state
@@ -34,14 +34,14 @@ class QDMGraphicsView(QGraphicsView):
 
     def __init__(self, grScene: "QDMGraphicsScene", parent: "QWidget" = None):
         """
-        :param grScene: reference to the :class:`~nodeeditor.node_graphics_scene.QDMGraphicsScene`
-        :type grScene: :class:`~nodeeditor.node_graphics_scene.QDMGraphicsScene`
+        :param grScene: reference to the :class:`~nodeeditor.node.graphics_scene.QDMGraphicsScene`
+        :type grScene: :class:`~nodeeditor.node.graphics_scene.QDMGraphicsScene`
         :param parent: parent widget
         :type parent: ``QWidget``
 
         :Instance Attributes:
 
-        - **grScene** - reference to the :class:`~nodeeditor.node_graphics_scene.QDMGraphicsScene`
+        - **grScene** - reference to the :class:`~nodeeditor.node.graphics_scene.QDMGraphicsScene`
         - **mode** - state of the `Graphics View`
         - **zoomInFactor**- ``float`` - zoom step scaling, default 1.25
         - **zoomClamp** - ``bool`` - do we clamp zooming or is it infinite?

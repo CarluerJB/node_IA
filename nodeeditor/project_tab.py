@@ -2,7 +2,7 @@ import os
 import json
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from nodeeditor.node_editor_tab import NodeEditorTabs
+from nodeeditor.node.editor_tab import NodeEditorTabs
 
 
 class ProjectTabs(QWidget):

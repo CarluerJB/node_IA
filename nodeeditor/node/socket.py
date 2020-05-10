@@ -3,8 +3,8 @@
 A module containing NodeEditor's class for representing Socket and Socket Position Constants.
 """
 from collections import OrderedDict
-from nodeeditor.node_serializable import Serializable
-from nodeeditor.node_graphics_socket import QDMGraphicsSocket
+from nodeeditor.node.serializable import Serializable
+from nodeeditor.node.graphics_socket import QDMGraphicsSocket
 
 
 LEFT_TOP = 1  #:
@@ -35,8 +35,8 @@ class Socket(Serializable):
         is_input: bool = False,
     ):
         """
-        :param node: reference to the :class:`~nodeeditor.node_node.Node` containing this `Socket`
-        :type node: :class:`~nodeeditor.node_node.Node`
+        :param node: reference to the :class:`~nodeeditor.node.node.Node` containing this `Socket`
+        :type node: :class:`~nodeeditor.node.node.Node`
         :param index: Current index of this socket in the position
         :type index: ``int``
         :param position: Socket position. See :ref:`socket-position-constants`
@@ -50,9 +50,9 @@ class Socket(Serializable):
 
         :Instance Attributes:
 
-            - **node** - reference to the :class:`~nodeeditor.node_node.Node` containing this `Socket`
+            - **node** - reference to the :class:`~nodeeditor.node.node.Node` containing this `Socket`
             - **edges** - list of `Edges` connected to this `Socket`
-            - **grSocket** - reference to the :class:`~nodeeditor.node_graphics_socket.QDMGraphicsSocket`
+            - **grSocket** - reference to the :class:`~nodeeditor.node.graphics_socket.QDMGraphicsSocket`
             - **position** - Socket position. See :ref:`socket-position-constants`
             - **index** - Current index of this socket in the position
             - **socket_type** - Constant defining type(color) of this socket
@@ -129,7 +129,7 @@ class Socket(Serializable):
 
     def setSocketPosition(self):
         """Helper function to set `Graphics Socket` position. Exact socket position is calculated
-        inside :class:`~nodeeditor.node_node.Node`."""
+        inside :class:`~nodeeditor.node.node.Node`."""
         self.grSocket.setPos(
             *self.node.getSocketPosition(
                 self.index, self.position, self.count_on_this_node_side
@@ -139,7 +139,7 @@ class Socket(Serializable):
     def getSocketPosition(self):
         """
         :return: Returns this `Socket` position according the implementation stored in
-            :class:`~nodeeditor.node_node.Node`
+            :class:`~nodeeditor.node.node.Node`
         :rtype: ``x, y`` position
         """
         if DEBUG:
@@ -153,19 +153,19 @@ class Socket(Serializable):
 
     def hasAnyEdge(self) -> bool:
         """
-        Returns ``True`` if any :class:`~nodeeditor.node_edge.Edge` is connectected to this socket
+        Returns ``True`` if any :class:`~nodeeditor.node.edge.Edge` is connectected to this socket
 
-        :return: ``True`` if any :class:`~nodeeditor.node_edge.Edge` is connected to this socket
+        :return: ``True`` if any :class:`~nodeeditor.node.edge.Edge` is connected to this socket
         :rtype: ``bool``
         """
         return len(self.edges) > 0
 
     def isConnected(self, edge: "Edge") -> bool:
         """
-        Returns ``True`` if :class:`~nodeeditor.node_edge.Edge` is connected to this `Socket`
+        Returns ``True`` if :class:`~nodeeditor.node.edge.Edge` is connected to this `Socket`
 
-        :param edge: :class:`~nodeeditor.node_edge.Edge` to check if it is connected to this `Socket`
-        :type edge: :class:`~nodeeditor.node_edge.Edge`
+        :param edge: :class:`~nodeeditor.node.edge.Edge` to check if it is connected to this `Socket`
+        :type edge: :class:`~nodeeditor.node.edge.Edge`
         :return: ``True`` if `Edge` is connected to this socket
         :rtype: ``bool``
         """
@@ -175,16 +175,16 @@ class Socket(Serializable):
         """
         Append an Edge to the list of connected Edges
 
-        :param edge: :class:`~nodeeditor.node_edge.Edge` to connect to this `Socket`
-        :type edge: :class:`~nodeeditor.node_edge.Edge`
+        :param edge: :class:`~nodeeditor.node.edge.Edge` to connect to this `Socket`
+        :type edge: :class:`~nodeeditor.node.edge.Edge`
         """
         self.edges.append(edge)
 
     def removeEdge(self, edge: "Edge"):
         """
-        Disconnect passed :class:`~nodeeditor.node_edge.Edge` from this `Socket`
-        :param edge: :class:`~nodeeditor.node_edge.Edge` to disconnect
-        :type edge: :class:`~nodeeditor.node_edge.Edge`
+        Disconnect passed :class:`~nodeeditor.node.edge.Edge` from this `Socket`
+        :param edge: :class:`~nodeeditor.node.edge.Edge` to disconnect
+        :type edge: :class:`~nodeeditor.node.edge.Edge`
         """
         if edge in self.edges:
             self.edges.remove(edge)

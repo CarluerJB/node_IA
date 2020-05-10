@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-from nodeeditor.node_scene import Scene, InvalidFile
-from nodeeditor.node_node import Node
-from nodeeditor.node_edge import Edge, EDGE_TYPE_BEZIER
-from nodeeditor.node_graphics_view import QDMGraphicsView
+from nodeeditor.node.scene import Scene, InvalidFile
+from nodeeditor.node.node import Node
+from nodeeditor.node.edge import Edge, EDGE_TYPE_BEZIER
+from nodeeditor.node.graphics_view import QDMGraphicsView
 
 from nodeeditor.IA_input_node import CustomNode_Input, CustomNode_Output, CustomNode_Add
 
@@ -37,8 +37,8 @@ class NodeEditorWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        """Set up this ``NodeEditorWidget`` with its layout,  :class:`~nodeeditor.node_scene.Scene` and
-        :class:`~nodeeditor.node_graphics_view.QDMGraphicsView`"""
+        """Set up this ``NodeEditorWidget`` with its layout,  :class:`~nodeeditor.node.scene.Scene` and
+        :class:`~nodeeditor.node.graphics_view.QDMGraphicsView`"""
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
@@ -83,7 +83,7 @@ class NodeEditorWidget(QWidget):
         return self.scene.getSelectedItems()
 
     def hasSelectedItems(self) -> bool:
-        """Is there something selected in the :class:`nodeeditor.node_scene.Scene`?
+        """Is there something selected in the :class:`nodeeditor.node.scene.Scene`?
 
         :return: ``True`` if there is something selected in the `Scene`
         :rtype: ``bool``
@@ -197,8 +197,8 @@ class NodeEditorWidget(QWidget):
 
     def addCustomNode(self):
         """Testing method to create a custom Node with custom content"""
-        from nodeeditor.node_content_widget import QDMNodeContentWidget
-        from nodeeditor.node_serializable import Serializable
+        from nodeeditor.node.content_widget import QDMNodeContentWidget
+        from nodeeditor.node.serializable import Serializable
 
         class NNodeContent(QLabel):  # , Serializable):
             def __init__(self, node, parent=None):

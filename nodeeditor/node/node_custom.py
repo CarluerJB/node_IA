@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from nodeeditor.node_node import Node
-from nodeeditor.node_content_widget import QDMNodeContentWidget
-from nodeeditor.node_graphics_node import QDMGraphicsNode
-from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
+from nodeeditor.node.node import Node
+from nodeeditor.node.content_widget import QDMNodeContentWidget
+from nodeeditor.node.graphics_node import QDMGraphicsNode
+from nodeeditor.node.socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 import numpy as np
 

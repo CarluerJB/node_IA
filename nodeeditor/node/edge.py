@@ -3,8 +3,8 @@
 A module containing NodeEditor's class for representing Edge and Edge Type Constants.
 """
 from collections import OrderedDict
-from nodeeditor.node_graphics_edge import *
-from nodeeditor.node_serializable import Serializable
+from nodeeditor.node.graphics_edge import *
+from nodeeditor.node.serializable import Serializable
 from nodeeditor.utils import dumpException
 
 
@@ -28,18 +28,18 @@ class Edge(Serializable):
     ):
         """
 
-        :param scene: Reference to the :py:class:`~nodeeditor.node_scene.Scene`
-        :type scene: :py:class:`~nodeeditor.node_scene.Scene`
+        :param scene: Reference to the :py:class:`~nodeeditor.node.scene.Scene`
+        :type scene: :py:class:`~nodeeditor.node.scene.Scene`
         :param start_socket: Reference to the starting socket
-        :type start_socket: :py:class:`~nodeeditor.node_socket.Socket`
+        :type start_socket: :py:class:`~nodeeditor.node.socket.Socket`
         :param end_socket: Reference to the End socket or ``None``
-        :type end_socket: :py:class:`~nodeeditor.node_socket.Socket` or ``None``
+        :type end_socket: :py:class:`~nodeeditor.node.socket.Socket` or ``None``
         :param edge_type: Constant determining type of edge. See :ref:`edge-type-constants`
 
         :Instance Attributes:
 
-            - **scene** - reference to the :class:`~nodeeditor.node_scene.Scene`
-            - **grEdge** - Instance of :class:`~nodeeditor.node_graphics_edge.QDMGraphicsEdge` subclass handling graphical representation in the ``QGraphicsScene``.
+            - **scene** - reference to the :class:`~nodeeditor.node.scene.Scene`
+            - **grEdge** - Instance of :class:`~nodeeditor.node.graphics_edge.QDMGraphicsEdge` subclass handling graphical representation in the ``QGraphicsScene``.
         """
         super().__init__()
         self.scene = scene
@@ -67,9 +67,9 @@ class Edge(Serializable):
         """
         Start socket
 
-        :getter: Returns start :class:`~nodeeditor.node_socket.Socket`
-        :setter: Sets start :class:`~nodeeditor.node_socket.Socket` safely
-        :type: :class:`~nodeeditor.node_socket.Socket`
+        :getter: Returns start :class:`~nodeeditor.node.socket.Socket`
+        :setter: Sets start :class:`~nodeeditor.node.socket.Socket` safely
+        :type: :class:`~nodeeditor.node.socket.Socket`
         """
         return self._start_socket
 
@@ -90,9 +90,9 @@ class Edge(Serializable):
         """
         End socket
 
-        :getter: Returns end :class:`~nodeeditor.node_socket.Socket` or ``None`` if not set
-        :setter: Sets end :class:`~nodeeditor.node_socket.Socket` safely
-        :type: :class:`~nodeeditor.node_socket.Socket` or ``None``
+        :getter: Returns end :class:`~nodeeditor.node.socket.Socket` or ``None`` if not set
+        :setter: Sets end :class:`~nodeeditor.node.socket.Socket` safely
+        :type: :class:`~nodeeditor.node.socket.Socket` or ``None``
         """
         return self._end_socket
 
@@ -114,7 +114,7 @@ class Edge(Serializable):
         Edge type
 
         :getter: get edge type constant for current ``Edge``. See :ref:`edge-type-constants`
-        :setter: sets new edge type. On background, creates new :class:`~nodeeditor.node_graphics_edge.QDMGraphicsEdge`
+        :setter: sets new edge type. On background, creates new :class:`~nodeeditor.node.graphics_edge.QDMGraphicsEdge`
             child class if necessary, adds this ``QGraphicsPathItem`` to the ``QGraphicsScene`` and updates edge sockets
             positions.
         """
@@ -142,10 +142,10 @@ class Edge(Serializable):
         """
         Returns the oposite socket on this ``Edge``
 
-        :param known_socket: Provide known :class:`~nodeeditor.node_socket.Socket` to be able to determine the oposite one.
-        :type known_socket: :class:`~nodeeditor.node_socket.Socket`
+        :param known_socket: Provide known :class:`~nodeeditor.node.socket.Socket` to be able to determine the oposite one.
+        :type known_socket: :class:`~nodeeditor.node.socket.Socket`
         :return: The oposite socket on this ``Edge`` or ``None``
-        :rtype: :class:`~nodeeditor.node_socket.Socket` or ``None``
+        :rtype: :class:`~nodeeditor.node.socket.Socket` or ``None``
         """
         return self.start_socket if known_socket == self.end_socket else self.end_socket
 
@@ -161,7 +161,7 @@ class Edge(Serializable):
 
     def updatePositions(self):
         """
-        Updates the internal `Graphics Edge` positions according to the start and end :class:`~nodeeditor.node_socket.Socket`.
+        Updates the internal `Graphics Edge` positions according to the start and end :class:`~nodeeditor.node.socket.Socket`.
         This should be called if you update ``Edge`` positions.
         """
         source_pos = self.start_socket.getSocketPosition()
@@ -179,7 +179,7 @@ class Edge(Serializable):
 
     def remove_from_sockets(self):
         """
-        Helper function which sets start and end :class:`~nodeeditor.node_socket.Socket` to ``None``
+        Helper function which sets start and end :class:`~nodeeditor.node.socket.Socket` to ``None``
         """
         self.end_socket = None
         self.start_socket = None
@@ -189,16 +189,16 @@ class Edge(Serializable):
         Safely remove this Edge.
 
         Removes `Graphics Edge` from the ``QGraphicsScene`` and it's reference to all GC to clean it up.
-        Notifies nodes previously connected :class:`~nodeeditor.node_node.Node` (s) about this event.
+        Notifies nodes previously connected :class:`~nodeeditor.node.node.Node` (s) about this event.
 
         Triggers Nodes':
 
-        - :py:meth:`~nodeeditor.node_node.Node.onEdgeConnectionChanged`
-        - :py:meth:`~nodeeditor.node_node.Node.onInputChanged`
+        - :py:meth:`~nodeeditor.node.node.Node.onEdgeConnectionChanged`
+        - :py:meth:`~nodeeditor.node.node.Node.onInputChanged`
 
-        :param silent_for_socket: :class:`~nodeeditor.node_socket.Socket` of a :class:`~nodeeditor.node_node.Node` which
+        :param silent_for_socket: :class:`~nodeeditor.node.socket.Socket` of a :class:`~nodeeditor.node_node.Node` which
             won't be notified, when this ``Edge`` is going to be removed
-        :type silent_for_socket: :class:`~nodeeditor.node_socket.Socket`
+        :type silent_for_socket: :class:`~nodeeditor.node.socket.Socket`
         :param silent: ``True`` if no events should be triggered during removing
         :type silent: ``bool``
         """

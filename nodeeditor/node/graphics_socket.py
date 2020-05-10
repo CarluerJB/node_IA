@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-A module containing Graphics representation of a :class:`~nodeeditor.node_socket.Socket`
+A module containing Graphics representation of a :class:`~nodeeditor.node.socket.Socket`
 """
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -22,8 +22,8 @@ class QDMGraphicsSocket(QGraphicsItem):
 
     def __init__(self, socket: "Socket"):
         """
-        :param socket: reference to :class:`~nodeeditor.node_socket.Socket`
-        :type socket: :class:`~nodeeditor.node_socket.Socket`
+        :param socket: reference to :class:`~nodeeditor.node.socket.Socket`
+        :type socket: :class:`~nodeeditor.node.socket.Socket`
         """
         super().__init__(socket.node.grNode)
         self.socket = socket
