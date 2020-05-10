@@ -3,9 +3,18 @@
 A module containing ``NodeEditorWidget`` class
 """
 import os
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import (
+    QApplication,
+    QLabel,
+    QWidget,
+    QVBoxLayout,
+    QMessageBox,
+    QGraphicsItem,
+    QPushButton,
+    QTextEdit,
+)
+from PyQt5.QtGui import QFont, QPen, QBrush, QColor
+from PyQt5.QtCore import Qt
 
 from nodeeditor.node.scene import Scene, InvalidFile
 from nodeeditor.node.node import Node

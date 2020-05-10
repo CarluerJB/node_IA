@@ -3,10 +3,9 @@
 A module containing Graphics representation of Edge
 """
 import math
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-
+from PyQt5.QtWidgets import QWidget, QGraphicsItem, QGraphicsPathItem
+from PyQt5.QtCore import Qt, QRectF, QPointF
+from PyQt5.QtGui import QColor, QPen, QPainterPath
 
 EDGE_CP_ROUNDNESS = 100  #: Bezier controll point distance on the line
 

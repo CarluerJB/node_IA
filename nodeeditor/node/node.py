@@ -4,10 +4,19 @@ A module containing NodeEditor's class for representing `Node`.
 """
 from nodeeditor.node.graphics_node import QDMGraphicsNode
 from nodeeditor.node.content_widget import QDMNodeContentWidget
-from nodeeditor.node.socket import *
 from nodeeditor.utils import dumpException, pp
-from nodeeditor.Node_type_conf import *
-from nodeeditor.node.socket_custom import *
+from nodeeditor.node.socket import (
+    Serializable,
+    Socket,
+    LEFT_BOTTOM,
+    RIGHT_TOP,
+    LEFT_CENTER,
+    LEFT_TOP,
+    RIGHT_CENTER,
+    RIGHT_BOTTOM,
+)
+from nodeeditor.Node_type_conf import DEFAULT_NODE_TYPE
+from nodeeditor.node.socket_custom import CustomSocket
 
 DEBUG = True
 
@@ -26,8 +35,8 @@ class Node(Serializable):
         self,
         scene: "Scene",
         title: str = "Undefined Node",
-        inputs: list = [],
-        outputs: list = [],
+        inputs: list = None,
+        outputs: list = None,
         n_type: int = 0,
     ):
         """
@@ -48,6 +57,11 @@ class Node(Serializable):
             - **outputs** - list containin Output :class:`~nodeeditor.node.socket.Socket` instances
 
         """
+        if inputs is None:
+            inputs = []
+        if outputs is None:
+            outputs = []
+
         super().__init__()
         self._title = title
         self.scene = scene
@@ -681,8 +695,11 @@ class Node(Serializable):
         )
 
     def deserialize(
-        self, data: dict, hashmap: dict = {}, restore_id: bool = True
+        self, data: dict, hashmap: dict = None, restore_id: bool = True
     ) -> bool:
+        if dict is None:
+            dict = {}
+
         try:
             if restore_id:
                 self.id = data["id"]

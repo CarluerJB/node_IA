@@ -1,8 +1,7 @@
 import os
 import json
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSplitter
+from PyQt5.QtCore import Qt
 
 from nodeeditor.node.editor_widget import NodeEditorWidget
 from nodeeditor.node.drag_list import NodeDragList
