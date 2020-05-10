@@ -309,7 +309,7 @@ class CustomNode_Input(CustomNode):
         try:
             s_value = ast.literal_eval(self.content.edit.text())
             self.shape = np.array(s_value)
-        except:
+        except Exception:
             self.shape = None
             self.addError("Invalid shape")
 

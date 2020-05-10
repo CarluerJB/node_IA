@@ -1,8 +1,8 @@
+from PyQt5.QtGui import QPen, QBrush, QColor
+from PyQt5.QtCore import QLine, QRectF
+
 from nodeeditor.node.graphics_socket import QDMGraphicsSocket
 from nodeeditor.node.socket import Socket
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
 
 
 class CustomGraphicsSocket(QDMGraphicsSocket):

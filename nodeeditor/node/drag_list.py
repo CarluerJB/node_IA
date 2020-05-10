@@ -1,8 +1,21 @@
 import json
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from nodeeditor.node.content_conf import *
+from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QListView, QListWidgetItem
+from PyQt5.QtGui import QPixmap, QIcon, QDrag
+from PyQt5.QtCore import (
+    QSize,
+    Qt,
+    QByteArray,
+    QDataStream,
+    QIODevice,
+    QMimeData,
+    QPoint,
+)
+
+from nodeeditor.node.content_conf import (
+    CUSTOM_NODES,
+    get_class_from_opcode,
+    LISTBOX_MIMETYPE,
+)
 
 
 class NodeDragList(QListWidget):
@@ -51,5 +64,5 @@ class NodeDragList(QListWidget):
             drag.setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2))
             drag.setPixmap(pixmap)
             drag.exec(Qt.MoveAction)
-        except:
+        except Exception:
             pass

@@ -4,15 +4,25 @@ A module containing Main Window class
 """
 import os
 import json
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QGraphicsProxyWidget,
+    QMenu,
+    QAction,
+    QMessageBox,
+    QLabel,
+    QFileDialog,
+    QApplication,
+)
+from PyQt5.QtCore import QIODevice, Qt, QDataStream, QSize
+from PyQt5.QtGui import QPixmap
+
 from nodeeditor.node.editor_widget import NodeEditorWidget
-from nodeeditor.node.content_conf import *
+from nodeeditor.node.content_conf import get_class_from_opcode, LISTBOX_MIMETYPE
 from nodeeditor.project_tab import ProjectTabs
 from nodeeditor.node.node_custom import CustomNode, CustomContent
 from nodeeditor.utils import dumpException
-from nodeeditor.IA_input_node import *
+from nodeeditor.IA_input_node import Node
 from nodeeditor.node.edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER
 
 
@@ -496,7 +506,7 @@ class NodeEditorWindow(QMainWindow):
                 return self.getCurrentNodeEditorWidget().scene.clipboard.deserializeFromClipboard(
                     data
                 )
-            except:
+            except Exception:
                 return
 
     def readSettings(self):

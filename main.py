@@ -1,9 +1,9 @@
-import os
-import sys
-import inspect
-from PyQt5.QtWidgets import *
+""" main script to execute """
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+import os
+import inspect
+import sys
+from PyQt5.QtWidgets import QApplication
 
 from nodeeditor.utils import loadStylesheet
 from nodeeditor.node.editor_window import NodeEditorWindow

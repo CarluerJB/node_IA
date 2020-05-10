@@ -3,8 +3,16 @@
 A module containing `Graphics View` for NodeEditor
 """
 from PyQt5.QtWidgets import QGraphicsView, QApplication
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore import QPoint, Qt, QEvent, pyqtSignal
+from PyQt5.QtGui import (
+    QPainter,
+    QDragEnterEvent,
+    QDropEvent,
+    QMouseEvent,
+    QKeyEvent,
+    QWheelEvent,
+)
+
 from nodeeditor.node.graphics_node import QDMGraphicsNode
 from nodeeditor.node.graphics_socket import QDMGraphicsSocket
 from nodeeditor.node.graphics_edge import QDMGraphicsEdge
@@ -243,14 +251,14 @@ class QDMGraphicsView(QGraphicsView):
                     try:
                         item.socket.node.addNewInSocket()
                         return
-                    except:
+                    except Exception:
                         self.mode = MODE_NOOP
                         super().mousePressEvent(event)
                 else:
                     try:
                         item.socket.node.addNewOutSocket()
                         return
-                    except:
+                    except Exception:
                         self.mode = MODE_NOOP
                         super().mousePressEvent(event)
 
@@ -260,14 +268,14 @@ class QDMGraphicsView(QGraphicsView):
                 try:
                     self.edgeDragStart(item)
                     return
-                except:
+                except Exception:
                     self.mode = MODE_NOOP
                     super().mousePressEvent(event)
 
         if self.mode == MODE_EDGE_DRAG:
             try:
                 res = self.edgeDragEnd(item)
-            except:
+            except Exception:
                 res = False
             if res:
                 return
@@ -321,7 +329,7 @@ class QDMGraphicsView(QGraphicsView):
             if self.distanceBetweenClickAndReleaseIsOff(event):
                 try:
                     res = self.edgeDragEnd(item)
-                except:
+                except Exception:
                     res = False
                 if res:
                     return
@@ -501,7 +509,7 @@ class QDMGraphicsView(QGraphicsView):
             self.drag_edge.remove(
                 silent=True
             )  # don't notify sockets about removing drag_edge
-        except:
+        except Exception:
             pass
         self.drag_edge = None
 

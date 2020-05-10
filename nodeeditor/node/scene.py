@@ -5,6 +5,7 @@ A module containing
 import os
 import json
 from collections import OrderedDict
+
 from nodeeditor.utils import dumpException
 from nodeeditor.node.serializable import Serializable
 from nodeeditor.node.graphics_scene import QDMGraphicsScene
@@ -12,7 +13,6 @@ from nodeeditor.node.node import Node
 from nodeeditor.node.edge import Edge
 from nodeeditor.node.scene_history import SceneHistory
 from nodeeditor.node.scene_clipboard import SceneClipboard
-
 from nodeeditor.saveToTF import generateNodeTree, generateStr
 
 DEBUG_REMOVE_WARNINGS = False

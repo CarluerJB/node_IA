@@ -1,7 +1,6 @@
 import os
 import json
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QPushButton
 from nodeeditor.node.editor_tab import NodeEditorTabs
 
 
