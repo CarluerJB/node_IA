@@ -1,15 +1,34 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from nodeeditor.node.content_conf import *
-from nodeeditor.node.node_custom import *
+from PyQt5.QtWidgets import (
+    QLabel,
+    QVBoxLayout,
+    QHBoxLayout,
+    QSpinBox,
+    QCheckBox,
+    QComboBox,
+    QLineEdit,
+)
+from PyQt5.QtCore import Qt
+
+from nodeeditor.node.content_conf import (
+    register_node,
+    OP_NODE_OUTPUT,
+    OP_NODE_DENSE,
+    OP_NODE_CONCAT,
+    OP_NODE_ADD,
+    OP_NODE_PROD,
+    OP_NODE_INPUT,
+    OP_NODE_CONV1D,
+    OP_NODE_CONV2D,
+    OP_NODE_ACTIVATION,
+)
+from nodeeditor.node.node_custom import (
+    CustomNode,
+    CustomGraphicsNode,
+    QDMNodeContentWidget,
+)
 from nodeeditor.utils import dumpException
-from nodeeditor.Node_type_conf import *
 from nodeeditor.node.socket import (
-    LEFT_BOTTOM,
-    LEFT_CENTER,
     LEFT_TOP,
-    RIGHT_BOTTOM,
-    RIGHT_CENTER,
     RIGHT_TOP,
 )
 import numpy as np
