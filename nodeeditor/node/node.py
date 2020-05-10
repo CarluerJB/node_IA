@@ -37,7 +37,7 @@ class Node(Serializable):
         title: str = "Undefined Node",
         inputs: list = None,
         outputs: list = None,
-        n_type: int = 0,
+        # n_type: int = 0,
     ):
         """
 
