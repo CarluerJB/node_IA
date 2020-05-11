@@ -21,7 +21,24 @@ from nodeeditor.node.node import Node
 from nodeeditor.node.edge import Edge, EDGE_TYPE_BEZIER
 from nodeeditor.node.graphics_view import QDMGraphicsView
 
-from nodeeditor.IA_input_node import CustomNode_Input, CustomNode_Output, CustomNode_Add
+# import of all custom nodes
+from nodeeditor.node.IANodes import (
+    dense,
+    concatenate,
+    add,
+    multiply,
+    input,
+    conv1d,
+    conv2d,
+    activation,
+    output
+)
+
+from nodeeditor.node.IANodes.add import CustomNode_Add
+from nodeeditor.node.IANodes.input import CustomNode_Input
+from nodeeditor.node.IANodes.output import CustomNode_Output
+
+#from nodeeditor.IA_input_node import CustomNode_Output
 
 
 class NodeEditorWidget(QWidget):

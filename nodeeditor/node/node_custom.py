@@ -145,7 +145,7 @@ class CustomNode(Node):
 
         if self.type != "input":
             if len(self.getInputs()) == 0:
-                self.addError("Hidden layer with no Inputs")
+                self.addError("Layer with no Inputs")
                 self.shape = None
                 self.endEval()
                 return

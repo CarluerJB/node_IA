@@ -17,6 +17,7 @@ from nodeeditor.node.socket import (
 )
 from nodeeditor.Node_type_conf import DEFAULT_NODE_TYPE
 from nodeeditor.node.socket_custom import CustomSocket
+from collections import OrderedDict
 
 DEBUG = True
 

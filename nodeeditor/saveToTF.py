@@ -58,7 +58,7 @@ def generateStr(nodeTree: list) -> str:
     result += "def Model():" + "\n"
 
     for node in nodeTree:
-        result += "\t{0} = {1}".format(node.reprname, node.tfrepr)
+        result += "    {0} = {1}".format(node.reprname, node.tfrepr)
         if len(node.children) == 1:
             result += "({0})".format(node.children[0].reprname)
         elif len(node.children) > 1:
@@ -74,7 +74,7 @@ def generateStr(nodeTree: list) -> str:
     print(inputs)
     print(outputs)
 
-    result += "\treturn keras.models.Model(inputs = "
+    result += "    return keras.models.Model(inputs = "
     if len(inputs) == 1:
         result += inputs[0].reprname
     elif len(inputs) > 1:
@@ -93,7 +93,7 @@ def generateStr(nodeTree: list) -> str:
     result += ")" + "\n\n"
 
     result += 'if __name__=="__main__":' + "\n"
-    result += "\tmodel = Model()" + "\n"
-    result += "\tmodel.summary()" + "\n"
+    result += "    model = Model()" + "\n"
+    result += "    model.summary()" + "\n"
 
     return result

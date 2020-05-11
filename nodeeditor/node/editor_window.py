@@ -22,7 +22,7 @@ from nodeeditor.node.content_conf import get_class_from_opcode, LISTBOX_MIMETYPE
 from nodeeditor.project_tab import ProjectTabs
 from nodeeditor.node.node_custom import CustomNode, CustomContent
 from nodeeditor.utils import dumpException
-from nodeeditor.IA_input_node import Node
+from nodeeditor.node.node import Node
 from nodeeditor.node.edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER
 
 
@@ -40,7 +40,7 @@ class NodeEditorWindow(QMainWindow):
         """
         super().__init__()
 
-        self.name_company = "Bionomy"
+        self.name_company = "BionomeeX"
         self.name_product = "NodeEditor"
 
         self.initUI()
@@ -67,7 +67,7 @@ class NodeEditorWindow(QMainWindow):
         self.scene = self.tabs_project.model_tab.nodeEditor.scene
 
         # set window properties
-        self.setGeometry(200, 200, 1600, 600)
+        self.setGeometry(100, 100, 2000, 1200)
         self.setTitle()
         # self.showMaximized()
         self.show()
