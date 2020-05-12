@@ -30,8 +30,16 @@ from nodeeditor.node.IANodes import (
     input,
     conv1d,
     conv2d,
+    conv3d,
+    depthwiseconv2d,
     activation,
-    output
+    output,
+    flatten,
+    maximum,
+    minimum,
+    maxpooling1d,
+    maxpooling2d,
+    maxpooling3d
 )
 
 from nodeeditor.node.IANodes.add import CustomNode_Add

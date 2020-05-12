@@ -74,7 +74,7 @@ def generateStr(nodeTree: list) -> str:
     print(inputs)
     print(outputs)
 
-    result += "    return keras.models.Model(inputs = "
+    result += "    return keras.models.Model(inputs="
     if len(inputs) == 1:
         result += inputs[0].reprname
     elif len(inputs) > 1:
@@ -82,7 +82,7 @@ def generateStr(nodeTree: list) -> str:
         for nn in inputs[1:]:
             result += ", {0}".format(nn.reprname)
         result += "]"
-    result += ", outputs = "
+    result += ", outputs="
     if len(outputs) == 1:
         result += outputs[0].reprname
     elif len(outputs) > 1:
