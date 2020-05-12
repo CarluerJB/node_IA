@@ -98,10 +98,12 @@ class CustomNode_UpSampling2D(CustomNode):
             return
 
         self.shape = np.array(INodes[0].shape)
-
-        self.shape[0] *= self.content.kernelsizex.value()
-        self.shape[1] *= self.content.kernelsizey.value()
-        self.shape[2] *= self.content.kernelsizez.value()
+        if self.shape[0] is not None:
+            self.shape[0] *= self.content.kernelsizex.value()
+        if self.shape[1] is not None:
+            self.shape[1] *= self.content.kernelsizey.value()
+        if self.shape[2] is not None:
+            self.shape[2] *= self.content.kernelsizez.value()
 
     def resetAll(self):
         super().resetAll()

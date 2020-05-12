@@ -75,4 +75,5 @@ class CustomNode_UpSampling1D(CustomNode):
             return
 
         self.shape = np.array(INodes[0].shape)
-        self.shape[0] *= self.content.size.value()
+        if self.shape[0] is not None:
+            self.shape[0] *= self.content.size.value()
