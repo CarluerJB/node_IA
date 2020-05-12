@@ -39,7 +39,10 @@ from nodeeditor.node.IANodes import (
     minimum,
     maxpooling1d,
     maxpooling2d,
-    maxpooling3d
+    maxpooling3d,
+    upsampling1d,
+    upsampling2d,
+    upsampling3d
 )
 
 from nodeeditor.node.IANodes.add import CustomNode_Add
