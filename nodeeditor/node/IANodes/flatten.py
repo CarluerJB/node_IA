@@ -23,6 +23,7 @@ class CustomNode_Add(CustomNode):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[1])
+        self.nononeinputshape = True
 
     def updatetfrepr(self):
         self.tfrepr = "keras.layers.Flatten()"

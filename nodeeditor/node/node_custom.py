@@ -55,6 +55,7 @@ class CustomNode(Node):
         self.value = None
         self.shape = None
         self.grNodeToolTip = ""
+        self.nononeinputshape = False
         self.updatetfrepr()
         self.setType()
         self.evalImplementation()
@@ -159,7 +160,12 @@ class CustomNode(Node):
 
             for node in self.getInputs():
                 for val in node.shape:
-                    if val == None:
+                    if val is None:
+                        if self.nononeinputshape:
+                            self.addError("This layer does not support None Input Shape")
+                            self.shape = None
+                            self.endEval()
+                            return
                         self.addInfo("Input shape contains None value")
                         break
 
