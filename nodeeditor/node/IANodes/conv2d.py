@@ -187,7 +187,7 @@ class CustomNode_Conv2D(CustomNode):
 
         self.shape[2] = self.content.filters.value()
 
-        if self.shape[0] != None:
+        if self.shape[0] is not None:
             self.shape[0] -= (
                 (self.content.kernelsizex.value() - 1)
                 if self.content.padding.currentText() == "valid"
@@ -199,7 +199,7 @@ class CustomNode_Conv2D(CustomNode):
         else:
             self.shape[0] = None
 
-        if self.shape[1] != None:
+        if self.shape[1] is not None:
             self.shape[1] -= (
                 (self.content.kernelsizey.value() - 1)
                 if self.content.padding.currentText() == "valid"

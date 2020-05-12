@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QSpinBox,
-    QComboBox
+    QComboBox,
+    QCheckBox
 )
 
 from PyQt5.QtCore import Qt
@@ -34,7 +35,7 @@ class CustomMaxPooling3DContent(QDMNodeContentWidget):
         self.VL = QVBoxLayout(self)
 
         self.HL2 = QHBoxLayout(self)
-        self.label2 = QLabel("Kernel Size :", self)
+        self.label2 = QLabel("Pool Size :", self)
         self.HL2.addWidget(self.label2)
         self.kernelsizex = QSpinBox(self)
         self.kernelsizex.setMinimum(1)
@@ -60,6 +61,9 @@ class CustomMaxPooling3DContent(QDMNodeContentWidget):
         self.HL3 = QHBoxLayout(self)
         self.label3 = QLabel("Strides :", self)
         self.HL3.addWidget(self.label3)
+        self.use_strides = QCheckBox(self)
+        self.HL3.addWidget(self.use_strides)
+        self.use_strides.setChecked(False)
         self.stridesx = QSpinBox(self)
         self.stridesx.setMinimum(1)
         self.stridesx.setMaximum(2147483647)
@@ -104,20 +108,20 @@ class CustomNode_MaxPooling3D(CustomNode):
 
     def updatetfrepr(self):
         self.tfrepr = (
-            "keras.layers.Conv3D(kernel_size=("
+            "keras.layers.Conv3D(pool_size=("
             + str(self.content.kernelsizex.value())
             + ", "
             + str(self.content.kernelsizey.value())
             + ", "
             + str(self.content.kernelsizez.value())
             + ")"
-            + ", strides=("
-            + str(self.content.stridesx.value())
+            + ", strides="
+            + (('(' + str(self.content.stridesx.value())
             + ", "
             + str(self.content.stridesy.value())
             + ", "
             + str(self.content.stridesz.value())
-            + ")"
+            + ")") if self.content.use_strides.isChecked() else "None")
             + ', padding="'
             + self.content.padding.currentText()
             + '")'
@@ -133,29 +137,9 @@ class CustomNode_MaxPooling3D(CustomNode):
         self.content.stridesy.valueChanged.connect(self.evalImplementation)
         self.content.stridesz.valueChanged.connect(self.evalImplementation)
         self.content.padding.currentIndexChanged.connect(self.evalImplementation)
+        self.content.use_strides.stateChanged.connect(self.evalImplementation)
 
     def EvalImpl_(self):
-        if self.content.kernelsizex.value() % 2 == 0:
-            self.addWarning(
-                "Even kernel size at pos 1",
-                self.content.kernelsizex,
-                "background-color: yellow;",
-            )
-
-        if self.content.kernelsizey.value() % 2 == 0:
-            self.addWarning(
-                "Even kernel size at pos 2",
-                self.content.kernelsizey,
-                "background-color: yellow;",
-            )
-
-        if self.content.kernelsizez.value() % 2 == 0:
-            self.addWarning(
-                "Even kernel size at pos 3",
-                self.content.kernelsizez,
-                "background-color: yellow;",
-            )
-
         if not self.content.kernelsizex.value() == self.content.kernelsizey.value() == self.content.kernelsizez.value():
             self.addWarning(
                 "Kernel size of different values", self.content.label2, "color: red;"
@@ -181,8 +165,13 @@ class CustomNode_MaxPooling3D(CustomNode):
                 if self.content.padding.currentText() == "valid"
                 else 0
             )
-            self.shape[0] = (self.shape[0] // self.content.stridesx.value()) + (
-                1 if self.shape[0] % self.content.stridesx.value() != 0 else 0
+
+            value = self.content.kernelsizex.value()
+            if self.content.use_strides.isChecked():
+                value = self.content.stridesx.value()
+
+            self.shape[0] = (self.shape[0] // value) + (
+                1 if self.shape[0] % value != 0 else 0
             )
         else:
             self.shape[0] = None
@@ -193,8 +182,13 @@ class CustomNode_MaxPooling3D(CustomNode):
                 if self.content.padding.currentText() == "valid"
                 else 0
             )
-            self.shape[1] = (self.shape[1] // self.content.stridesy.value()) + (
-                1 if self.shape[1] % self.content.stridesy.value() != 0 else 0
+
+            value = self.content.kernelsizey.value()
+            if self.content.use_strides.isChecked():
+                value = self.content.stridesy.value()
+
+            self.shape[1] = (self.shape[1] // value) + (
+                1 if self.shape[1] % value != 0 else 0
             )
         else:
             self.shape[1] = None
@@ -205,8 +199,13 @@ class CustomNode_MaxPooling3D(CustomNode):
                 if self.content.padding.currentText() == "valid"
                 else 0
             )
-            self.shape[2] = (self.shape[2] // self.content.stridesz.value()) + (
-                1 if self.shape[2] % self.content.stridesz.value() != 0 else 0
+
+            value = self.content.kernelsizez.value()
+            if self.content.use_strides.isChecked():
+                value = self.content.stridesz.value()
+
+            self.shape[2] = (self.shape[2] // value) + (
+                1 if self.shape[2] % value != 0 else 0
             )
         else:
             self.shape[2] = None
@@ -216,10 +215,3 @@ class CustomNode_MaxPooling3D(CustomNode):
         self.content.label2.setStyleSheet("color : white;")
         self.content.label2.setToolTip("")
         self.content.label3.setStyleSheet("color : white;")
-
-        self.content.kernelsizex.setStyleSheet("background-color: white;")
-        self.content.kernelsizex.setToolTip("")
-        self.content.kernelsizey.setStyleSheet("background-color: white;")
-        self.content.kernelsizey.setToolTip("")
-        self.content.kernelsizez.setStyleSheet("background-color: white;")
-        self.content.kernelsizez.setToolTip("")

@@ -212,7 +212,7 @@ class CustomNode_Conv3D(CustomNode):
 
         self.shape[3] = self.content.filters.value()
 
-        if self.shape[0] != None:
+        if self.shape[0] is not None:
             self.shape[0] -= (
                 (self.content.kernelsizex.value() - 1)
                 if self.content.padding.currentText() == "valid"
@@ -224,7 +224,7 @@ class CustomNode_Conv3D(CustomNode):
         else:
             self.shape[0] = None
 
-        if self.shape[1] != None:
+        if self.shape[1] is not None:
             self.shape[1] -= (
                 (self.content.kernelsizey.value() - 1)
                 if self.content.padding.currentText() == "valid"
@@ -236,7 +236,7 @@ class CustomNode_Conv3D(CustomNode):
         else:
             self.shape[1] = None
 
-        if self.shape[2] != None:
+        if self.shape[2] is not None:
             self.shape[2] -= (
                 (self.content.kernelsizez.value() - 1)
                 if self.content.padding.currentText() == "valid"

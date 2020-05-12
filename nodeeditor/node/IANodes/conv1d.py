@@ -130,6 +130,13 @@ class CustomNode_Conv1D(CustomNode):
         self.content.padding.currentIndexChanged.connect(self.evalImplementation)
 
     def EvalImpl_(self):
+        if self.content.kernelsize.value() % 2 == 0:
+            self.addWarning(
+                "Even kernel size",
+                self.content.kernelsize,
+                "background-color: yellow;",
+            )
+
         INodes = self.getInputs()
 
         if len(INodes[0].shape) != 2:
@@ -141,11 +148,19 @@ class CustomNode_Conv1D(CustomNode):
 
         self.shape[1] = self.content.filters.value()
 
-        self.shape[0] -= (
-            (self.content.kernelsize.value() - 1)
-            if self.content.padding.currentText() == "valid"
-            else 0
-        )
-        self.shape[0] = (self.shape[0] // self.content.strides.value()) + (
-            1 if self.shape[0] % self.content.strides.value() != 0 else 0
-        )
+        if self.shape[0] is not None:
+            self.shape[0] -= (
+                (self.content.kernelsize.value() - 1)
+                if self.content.padding.currentText() == "valid"
+                else 0
+            )
+            self.shape[0] = (self.shape[0] // self.content.strides.value()) + (
+                1 if self.shape[0] % self.content.strides.value() != 0 else 0
+            )
+        else:
+            self.shape[0] = None
+
+    def resetAll(self):
+        super().resetAll()
+        self.content.kernelsize.setStyleSheet("background-color: white;")
+        self.content.kernelsize.setToolTip("")

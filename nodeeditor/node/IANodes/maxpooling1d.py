@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QSpinBox,
-    QComboBox
+    QComboBox,
+    QCheckBox
 )
 
 from PyQt5.QtCore import Qt
@@ -48,6 +49,9 @@ class CustomMaxPooling1DContent(QDMNodeContentWidget):
         self.HL3 = QHBoxLayout(self)
         self.label3 = QLabel("Strides :", self)
         self.HL3.addWidget(self.label3)
+        self.use_strides = QCheckBox(self)
+        self.HL3.addWidget(self.use_strides)
+        self.use_strides.setChecked(False)
         self.strides = QSpinBox(self)
         self.strides.setMinimum(1)
         self.strides.setMaximum(2147483647)
@@ -82,7 +86,7 @@ class CustomNode_MaxPooling1D(CustomNode):
             "keras.layers.MaxPooling1D(pool_size="
             + str(self.content.kernelsize.value())
             + ", strides="
-            + str(self.content.strides.value())
+            + (str(self.content.strides.value()) if self.content.use_strides.isChecked() else "None")
             + ', padding="'
             + self.content.padding.currentText()
             + '")'
@@ -94,6 +98,7 @@ class CustomNode_MaxPooling1D(CustomNode):
         self.content.kernelsize.valueChanged.connect(self.evalImplementation)
         self.content.strides.valueChanged.connect(self.evalImplementation)
         self.content.padding.currentIndexChanged.connect(self.evalImplementation)
+        self.content.use_strides.stateChanged.connect(self.evalImplementation)
 
     def EvalImpl_(self):
         INodes = self.getInputs()
@@ -105,11 +110,19 @@ class CustomNode_MaxPooling1D(CustomNode):
 
         self.shape = np.array(INodes[0].shape)
 
-        self.shape[0] -= (
-            (self.content.kernelsize.value() - 1)
-            if self.content.padding.currentText() == "valid"
-            else 0
-        )
-        self.shape[0] = (self.shape[0] // self.content.strides.value()) + (
-            1 if self.shape[0] % self.content.strides.value() != 0 else 0
-        )
+        if self.shape[0] is not None:
+            self.shape[0] -= (
+                (self.content.kernelsize.value() - 1)
+                if self.content.padding.currentText() == "valid"
+                else 0
+            )
+
+            value = self.content.kernelsize.value()
+            if self.content.use_strides.isChecked():
+                value = self.content.strides.value()
+
+            self.shape[0] = (self.shape[0] // value) + (
+                1 if self.shape[0] % value != 0 else 0
+            )
+        else:
+            self.shape[0] = None
