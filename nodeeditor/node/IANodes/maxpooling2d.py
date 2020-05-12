@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import (
 
 from PyQt5.QtCore import Qt
 
+import numpy as np
+
 from nodeeditor.node.content_conf import (
     register_node,
     OP_NODE_MAXPOOLING2D
@@ -145,6 +147,8 @@ class CustomNode_MaxPooling2D(CustomNode):
             self.addError("MaxPooling2D need input shape of exactly size 3")
             self.shape = None
             return
+
+        self.shape = np.array(INodes[0].shape)
 
         if self.shape[0] != None:
             self.shape[0] -= (
