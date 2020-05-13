@@ -26,18 +26,19 @@ class CustomNode_Squeeze(CustomNode):
 
     def updatetfrepr(self):
         INodes = self.getInputs()
-        if INodes is not None:
-            idx = []
-            for i, v in enumerate(INodes[0].shape):
-                if v == 1:
-                    idx.append(str(i + 1))
-            if idx:
-                self.tfrepr = (
-                    "keras.layers.Lambda(lambda x: tf.squeeze(x, ["
-                    + ", ".join(idx)
-                    + "]))"
-                )
-                return
+        if INodes:
+            if INodes[0].shape is not None:
+                idx = []
+                for i, v in enumerate(INodes[0].shape):
+                    if v == 1:
+                        idx.append(str(i + 1))
+                if idx:
+                    self.tfrepr = (
+                        "keras.layers.Lambda(lambda x: tf.squeeze(x, ["
+                        + ", ".join(idx)
+                        + "]))"
+                    )
+                    return
         self.tfrepr = (
             "keras.layers.Lambda(lambda x: x)"
         )

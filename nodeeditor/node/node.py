@@ -698,7 +698,7 @@ class Node(Serializable):
     def deserialize(
         self, data: dict, hashmap: dict = None, restore_id: bool = True
     ) -> bool:
-        if dict is None:
+        if hashmap is None:
             dict = {}
 
         try:

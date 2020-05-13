@@ -26,7 +26,7 @@ class CustomEmbeddingGraphic(CustomGraphicsNode):
     def initSizes(self):
         super().initSizes()
         self.height = 105
-        self.width = 170
+        self.width = 200
 
 
 class CustomEmbeddingContent(QDMNodeContentWidget):
@@ -67,18 +67,23 @@ class CustomNode_Embedding(CustomNode):
         super().__init__(scene, inputs=[1], outputs=[1])
 
     def updatetfrepr(self):
+        INodes = self.getInputs()
+        input_length = ""
+        if INodes:
+            if INodes[0].shape is not None:
+                if ([el for el in INodes[0].shape if el is not None] == INodes[0].shape).all():
+                    input_length = (
+                        ', input_length=['
+                        + ", ".join([str(e) for e in INodes[0].shape])
+                        + ']'
+                    )
         self.tfrepr = (
             "keras.layers.Embedding(input_dim="
             + str(self.content.cardinal.value() + 1)
-            + ", kernel_size="
-            + str(self.content.kernelsize.value())
-            + ", strides="
-            + str(self.content.strides.value())
-            + ', padding="'
-            + self.content.padding.currentText()
-            + '", activation="'
-            + self.content.activation.currentText()
-            + '")'
+            + ", output_dim="
+            + str(self.content.outputdim.value())
+            + input_length
+            + ')'
         )
 
     def initInnerClasses(self):
@@ -95,6 +100,7 @@ class CustomNode_Embedding(CustomNode):
             self.shape = None
             return
 
-        self.shape = np.array(INodes[0].shape)
-
+        self.shape = np.zeros(len(INodes[0].shape)+1)
+        for i, v in enumerate(INodes[0].shape):
+            self.shape[i] = v
         self.shape[-1] = self.content.outputdim.value()
