@@ -42,7 +42,10 @@ from nodeeditor.node.IANodes import (
     maxpooling3d,
     upsampling1d,
     upsampling2d,
-    upsampling3d
+    upsampling3d,
+    globalmaxpooling1d,
+    globalmaxpooling2d,
+    globalmaxpooling3d
 )
 
 from nodeeditor.node.IANodes.add import CustomNode_Add
@@ -230,6 +233,8 @@ class NodeEditorWidget(QWidget):
         node3.onEdgeConnectionChanged(edge3)
         node4.onEdgeConnectionChanged(edge3)
 
+        node1.evalImplementation()
+        node2.evalImplementation()
         self.scene.history.storeInitialHistoryStamp()
 
     def addCustomNode(self):
