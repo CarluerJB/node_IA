@@ -27,6 +27,7 @@ from nodeeditor.node.IANodes import (
     concatenate,
     add,
     multiply,
+    average,
     input,
     conv1d,
     conv2d,
