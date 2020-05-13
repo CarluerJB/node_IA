@@ -34,7 +34,7 @@ class CustomInputShapeContent(QDMNodeContentWidget):
         self.VL = QVBoxLayout(self)
 
         self.HL = QHBoxLayout(self)
-        self.ishape = QLineEdit("(0, 0)", self)
+        self.ishape = QLineEdit("[32, 32, 3]", self)
         self.HL.addWidget(self.ishape)
         self.ishape.setAlignment(Qt.AlignRight)
         self.ishape.setObjectName(self.node.content_label_objname)
