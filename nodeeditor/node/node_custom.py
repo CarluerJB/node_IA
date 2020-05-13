@@ -56,12 +56,14 @@ class CustomNode(Node):
         self.shape = None
         self.grNodeToolTip = ""
         self.nononeinputshape = False
-        self.updatetfrepr()
         self.setType()
+        self.updatetfrepr()
         self.evalImplementation()
 
     def setType(self):
+        print("----")
         self.type = "hidden"
+        print(self.type)
 
     def updatetfrepr(self):
         self.tfrepr = "pass"

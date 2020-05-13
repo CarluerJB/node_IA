@@ -46,7 +46,8 @@ from nodeeditor.node.IANodes import (
     upsampling3d,
     globalmaxpooling1d,
     globalmaxpooling2d,
-    globalmaxpooling3d
+    globalmaxpooling3d,
+    squeeze
 )
 
 from nodeeditor.node.IANodes.add import CustomNode_Add
