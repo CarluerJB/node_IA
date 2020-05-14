@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QColor, QPen, QPainter, QMouseEvent
 from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsPixmapItem
-from annotation_point import point
+from data.image_annotation.point import point
 
 MODE_POINT = 1
 MODE_LINE = 2

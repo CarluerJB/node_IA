@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import math
-from annotation_scene import ImageScene
-from annotation_graphic_view import QDMGraphicsView
+from data.image_annotation.scene import ImageScene
+from data.image_annotation.Graphics import QDMGraphicsView
 
 
 

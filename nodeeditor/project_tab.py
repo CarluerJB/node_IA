@@ -2,6 +2,7 @@ import os
 import json
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget, QWidget, QPushButton
 from nodeeditor.node.editor_tab import NodeEditorTabs
+from data.image_annotation.windows import AnnotationTool
 
 
 class ProjectTabs(QWidget):
@@ -13,7 +14,7 @@ class ProjectTabs(QWidget):
         self.layout = QVBoxLayout(self)
         self.tabs = QTabWidget()
         self.project_tab = QWidget()
-        self.data_tab = QWidget()
+        self.data_tab = AnnotationTool(self)
         self.training_tab = QWidget()
         self.model_tab = NodeEditorTabs(self)
         self.deployment_tab = QWidget()

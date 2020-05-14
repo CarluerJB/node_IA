@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsPixmapItem
-from annotation_graphic_scene import QDMGraphicsScene
-from annotation_image import Image
+from data.image_annotation.Graphics import QDMGraphicsScene
+from data.image_annotation.image import Image
 
 class ImageScene():
     def __init__(self):
@@ -17,8 +17,8 @@ class ImageScene():
 
     def init_images(self):
         # TO REMOVE IN FUTURE
-        self.image_annotation.append(Image("le_parrain.jpg"))
-        self.image_annotation.append(Image("DiagVS1Dresult_support_10_0.6_100.png"))
+        self.image_annotation.append(Image("data/image_annotation/le_parrain.jpg"))
+        self.image_annotation.append(Image("data/image_annotation/DiagVS1Dresult_support_10_0.6_100.png"))
 
 
 

@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtCore import QRectF
 
-"""Appearance of point element"""
-class Graphic_point(QGraphicsItem):
+
+class QDMGraphicsPoint(QGraphicsItem):
     def __init__(self, point, parent=None):
         super().__init__(parent)
         self.point = point

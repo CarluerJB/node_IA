@@ -1,11 +1,11 @@
-from annotation_graphic_point import Graphic_point
+from data.image_annotation.Graphics import QDMGraphicsPoint
 
 # point data for actual image
 class point():
     def __init__(self, scene):
         super().__init__()
         self.scene = scene
-        self.grPoint = Graphic_point(self)
+        self.grPoint = QDMGraphicsPoint(self)
         self.coordinates = (0,0)
         self.scene.get_actual_image().addPoint(self)
         self.show()

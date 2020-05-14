@@ -2,7 +2,7 @@ import os
 import sys
 from PyQt5.QtWidgets import *
 
-from annotation_windows import AnnotationEditorWindow
+from windows import AnnotationEditorWindow
 
 
 
