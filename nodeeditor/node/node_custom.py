@@ -130,6 +130,8 @@ class CustomNode(Node):
             self.shape = np.array(INodes[0].shape)
 
     def endEval(self):
+        if self.shape is not None and len(self.shape) == 1:
+            self.shape = np.array(self.shape)
         self.grNode.setToolTip(self.grNodeToolTip)
         if self.type != "output":
             self.outputs[0].grSocket.setToolTip(str(self.shape))

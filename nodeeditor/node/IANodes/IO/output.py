@@ -8,7 +8,7 @@ from nodeeditor.node.node_custom import (
     CustomNode
 )
 
-from nodeeditor.node.IANodes.activation import CustomActivationContent
+from nodeeditor.node.IANodes.Core.activation import CustomActivationContent
 
 @register_node(OP_NODE_OUTPUT)
 class CustomNode_Output(CustomNode):

@@ -22,22 +22,8 @@ from nodeeditor.node.edge import Edge, EDGE_TYPE_BEZIER
 from nodeeditor.node.graphics_view import QDMGraphicsView
 
 # import of all custom nodes
-from nodeeditor.node.IANodes import (
-    dense,
-    concatenate,
-    add,
-    multiply,
-    average,
-    input,
-    conv1d,
-    conv2d,
-    conv3d,
-    depthwiseconv2d,
-    activation,
-    output,
-    flatten,
-    maximum,
-    minimum,
+from nodeeditor.node.IANodes.Shapemanip import (
+
     maxpooling1d,
     maxpooling2d,
     maxpooling3d,
@@ -47,13 +33,41 @@ from nodeeditor.node.IANodes import (
     globalmaxpooling1d,
     globalmaxpooling2d,
     globalmaxpooling3d,
-    squeeze,
+)
+from nodeeditor.node.IANodes.IO import (
+    input,
+    output,
     embedding
 )
+from nodeeditor.node.IANodes.Merge import (
+    add,
+    average,
+    maximum,
+    minimum,
+    multiply,
+    concatenate
+)
+from nodeeditor.node.IANodes.Conv import (
+    conv1d,
+    conv2d,
+    conv3d,
+    depthwiseconv2d
+)
+from nodeeditor.node.IANodes.Core import (
+    dense,
+    activation,
+    flatten,
+    squeeze
+)
 
-from nodeeditor.node.IANodes.add import CustomNode_Add
-from nodeeditor.node.IANodes.input import CustomNode_Input
-from nodeeditor.node.IANodes.output import CustomNode_Output
+from nodeeditor.node.IANodes.simple import (
+    simpleconv
+)
+
+
+from nodeeditor.node.IANodes.Merge.add import CustomNode_Add
+from nodeeditor.node.IANodes.IO.input import CustomNode_Input
+from nodeeditor.node.IANodes.IO.output import CustomNode_Output
 
 #from nodeeditor.IA_input_node import CustomNode_Output
 

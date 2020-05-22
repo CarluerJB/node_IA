@@ -30,7 +30,6 @@ class CustomNode_Concat(CustomNode):
         self.input_multi_edged = True
 
     def initInnerClasses(self):
-        # self.content = CustomDenseContent(self)
         self.grNode = CustomGraphicsNode(self)
 
     def EvalImpl_(self):
