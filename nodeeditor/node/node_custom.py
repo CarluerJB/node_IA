@@ -184,8 +184,7 @@ class CustomNode(Node):
             )
             return self.value
         try:
-            val = self.evalImplementation()
-            return val
+            return self.evalImplementation()
         except ValueError as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))

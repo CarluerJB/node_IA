@@ -145,18 +145,19 @@ class SceneHistory:
             )
 
         # if the pointer (history_current_step) is not at the end of history_stack
-        if self.history_current_step + 1 < len(self.history_stack):
-            self.history_stack = self.history_stack[0 : self.history_current_step + 1]
+        if self.history_current_step != -1:
+            self.history_stack = self.history_stack[:(self.history_current_step+1)]
 
         # history is outside of the limits
-        if self.history_current_step + 1 >= self.history_limit:
-            self.history_stack = self.history_stack[1:]
-            self.history_current_step -= 1
+
+        #self.history_stack = self.history_stack[1:]
+        #self.history_current_step -= 1
 
         hs = self.createHistoryStamp(desc)
 
         self.history_stack.append(hs)
-        self.history_current_step += 1
+        self.history_current_step = -1
+
         if DEBUG:
             print("  -- setting step to:", self.history_current_step)
 
@@ -220,3 +221,69 @@ class SceneHistory:
 
         except Exception as e:
             dumpException(e)
+
+    def get_last_created_nodes_from_position(self, position):
+        # renvoi la liste des noeuds + la position de la derniere creation de noeud
+
+        # si position == None on renvoi None, None
+        if position is None:
+            return None, None
+
+        # A chaque étape:
+        #   - on check si position est positive:
+        #   - on check si on est bien un CREATE NODE
+        #       - Si oui : on renvois la liste des nodes + notre position
+        #       - Si non : on décrémente position
+        while position + len(self.history_stack) >= 0:
+            if self.history_stack[position]['desc'].startswith("Create node"):
+                return [node["id"] for node in self.history_stack[position]["snapshot"]["nodes"]], position
+            else:
+                position -= 1
+
+        return None, None
+
+    def get_last_placed_node_impl(self, position):
+        if position is None:
+            return None, None
+
+        # recuperer le dernier "CREATE NODE" idD
+        idD, pos = self.get_last_created_nodes_from_position(position)
+        print(idD)
+        print(pos)
+
+        # 3eme cas : idD == None (=> idA == None)
+        #   -   on renvoi None
+        if idD is None:
+            return None, None
+
+        # recuperer l'avant-dernier "CREATE NODE" idA
+        idA, _ = self.get_last_created_nodes_from_position(pos-1)
+        print(idA)
+        print(_)
+
+        # 2eme cas : idD != None & idA == None
+        #   -   on renvoi le node associé au seul element de idD
+        if idA is None:
+            for node in self.scene.nodes:
+                if node.id == idD[0]:
+                    return node, None
+
+        # 1er cas : idD != None & idA != None
+        #   -   on renvoi le node associé à l'élément dans idD qui n'est pas dans idA
+        ID = list(set(idD) - set(idA))[0]
+        for node in self.scene.nodes:
+            if node.id == ID:
+                return node, _
+
+        return None, _
+
+
+    def get_last_placed_node(self):
+        if not self.history_stack:
+            return None
+
+        ID = None
+        pos = self.history_current_step
+        while ID is None and pos is not None:
+            ID, pos = self.get_last_placed_node_impl(pos)
+        return ID

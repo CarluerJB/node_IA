@@ -23,7 +23,7 @@ from nodeeditor.project_tab import ProjectTabs
 from nodeeditor.node.node_custom import CustomNode, CustomContent
 from nodeeditor.utils import dumpException
 from nodeeditor.node.node import Node
-from nodeeditor.node.edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER
+from nodeeditor.node.edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, Edge
 
 
 class NodeEditorWindow(QMainWindow):
@@ -137,9 +137,20 @@ class NodeEditorWindow(QMainWindow):
             try:
                 node = get_class_from_opcode(op_code)(self.scene)
                 node.setPos(scene_position.x(), scene_position.y())
+                preceding_node = None
+                if QApplication.keyboardModifiers() & Qt.ControlModifier:
+                    preceding_node = self.scene.history.get_last_placed_node()
                 self.scene.history.storeHistory(
-                    "Create node %s" % node.__class__.__name__
+                    "Create node %s" % node.__class__.__name__,
+                    setModified = True
                 )
+                if preceding_node:
+                    if preceding_node.type != "output":
+                        edge = Edge(self.scene, start_socket=preceding_node.outputs[0], end_socket=node.inputs[0], edge_type=EDGE_TYPE_BEZIER)
+                        self.scene.history.storeHistory(
+                            "Create new edge automatically %s" % edge.__class__.__name__,
+                            setModified = True
+                        )
             except Exception as e:
                 dumpException(e)
         else:

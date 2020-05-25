@@ -516,6 +516,8 @@ class QDMGraphicsView(QGraphicsView):
         try:
             if isinstance(item, CustomGraphicsSocket):
                 return False
+            if isinstance(item, QDMGraphicsNode):
+                print("***")
             if isinstance(item, QDMGraphicsSocket):
                 if item.socket != self.drag_start_socket:
                     # if we released dragging on a socket (other then the beginning socket)
@@ -550,7 +552,7 @@ class QDMGraphicsView(QGraphicsView):
 
                         ## Send notifications for the new edge
                         for socket in [self.drag_start_socket, item.socket]:
-                            # @TODO: Add possibility (ie when an input edge was replaced) to be silent and don't trigger change
+                            # TODO: Add possibility (ie when an input edge was replaced) to be silent and don't trigger change
                             socket.node.onEdgeConnectionChanged(new_edge)
                             if socket.is_input:
                                 socket.node.onInputChanged(socket)

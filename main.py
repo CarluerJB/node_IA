@@ -13,7 +13,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     wnd = NodeEditorWindow()
-    wnd.tabs_project.model_tab.nodeEditor.addNodes()
+    #wnd.tabs_project.model_tab.nodeEditor.addNodes()
     module_path = os.path.dirname(inspect.getfile(wnd.__class__))
 
     loadStylesheet(os.path.join(module_path, "qss/nodestyle.qss"))
