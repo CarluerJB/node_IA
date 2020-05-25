@@ -16,7 +16,7 @@ from nodeeditor.node.socket import (
 )
 
 @register_node(OP_NODE_FLATTEN)
-class CustomNode_Add(CustomNode):
+class CustomNode_Flatten(CustomNode):
     icon = ""
     op_code = OP_NODE_FLATTEN
     op_title = "Flatten"
